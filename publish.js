@@ -15,6 +15,11 @@ var execSync = require("child_process").execSync;
 
 var publish = {};
 
+/**
+ * Processes the argv command line arguments into an object
+ *
+ * @returns {Object} - the CLI arguments as an options object
+ */
 publish.getCLIOpts = function () {
     var opts = {
         options: {}
@@ -37,10 +42,14 @@ publish.getCLIOpts = function () {
     return opts;
 };
 
-// @param num {Number}
-// @param with {Number} - the min-width of the number,
-//                        if the number is shorter it will be padded with zeros on the left
-// @returns {String} - a string representation of the number with padding as needed
+/**
+ * Creaes a number with 0's padded on the left
+ *
+ * @param num {Number}
+ * @param with {Number} - the min-width of the number,
+ *                        if the number is shorter it will be padded with zeros on the left
+ * @returns {String} - a string representation of the number with padding as needed
+ */
 publish.padZeros = function (num, width) {
     width = width || 2;
     var numstr = num ? num.toString() : "";
@@ -52,8 +61,12 @@ publish.padZeros = function (num, width) {
     return numstr;
 };
 
-// @param timestamp {String} - timestamp in seconds as returned by "git show -s --format=%ct HEAD"
-// @returns {Object} - an object of date properties
+/**
+ * Creates a date object from a git timestamp
+ *
+ * @param timestamp {String} - timestamp in seconds as returned by "git show -s --format=%ct HEAD"
+ * @returns {Object} - an object of date properties
+ */
 publish.fromTimestamp = function (timestamp) {
     var timestampInMS = Number(timestamp) * 1000;
     var date = new Date(timestampInMS);
@@ -68,8 +81,12 @@ publish.fromTimestamp = function (timestamp) {
     };
 };
 
-// @param timestamp {String} - timestamp in seconds as returned by "git show -s --format=%ct HEAD"
-// @returns {String} - the time in the ISO8601 format yyyymmddThhmmssZ
+/**
+ * Converts a git timestamp into an ISO8601 timestamp
+ *
+ * @param timestamp {String} - timestamp in seconds as returned by "git show -s --format=%ct HEAD"
+ * @returns {String} - the time in the ISO8601 format yyyymmddThhmmssZ
+ */
 publish.convertoISO8601 = function (timestamp) {
     var date = publish.fromTimestamp(timestamp);
 
@@ -85,39 +102,111 @@ publish.timestamp = execSync("git show -s --format=%ct HEAD");
 publish.commitHash = execSync("git rev-parse --verify --short HEAD");
 publish.devVersion = [pkg.version, publish.convertoISO8601(publish.timestamp), publish.commitHash].join(".");
 
+/**
+ * Throws an error if there are any uncommitted changes
+ */
 publish.checkChanges = function () {
     if (publish.gitChanges.length) {
         throw new Error("You have uncommitted changes\n" + publish.gitChanges);
     }
 };
 
-publish.dev = function () {
-    publish.checkChanges();
-    // set the version number
+/**
+ * Updates the package.json version to the current dev release version
+ * This does not commit the change, it will only modify the file.
+ */
+publish.setDevVersion = function () {
     execSync("npm version --no-git-tag-version " + publish.devVersion);
+};
 
-    // publish to npm
-    // execSync("npm publish");
-    execSync("npm pack");
+/**
+ * Publishes the module to npm using the current version number in pacakge.json.
+ * If isTest is specified, it will instead create a tarball in the local directory.
+ *
+ * @param isTest {Boolean} - indicates if this is a test run or not
+ */
+publish.pubImpl = function (isTest) {
+    if (isTest) {
+        // create a local tarball
+        execSync("npm pack");
+    } else {
+        // publish to npm
+        execSync("npm publish");
+    }
+};
 
-    // add dist-tag
-    // execSync("npm dist-tag add infusion@" + publish.devVersion + " dev");
-    console.log("npm dist-tag add infusion@" + publish.devVersion + " dev");
+/**
+ * Tags the specified version with the specified dist-tag
+ * If it is a test run, the tag command will be output to the console.
+ *
+ * @param isTest {Boolean} - indicates if this is a test run or not
+ * @param version {String} - a string idicating which version to tag
+ * @param tag {String} - the dist-tag to apply
+ */
+publish.tag = function (isTest, version, tag) {
+    if (isTest) {
+        console.log("npm dist-tag add infusion@" + version + " " + tag);
+    } else {
+        execSync("npm dist-tag add infusion@" + version + " " + tag);
+    }
+};
 
-    // cleanup changes
+/**
+ * Resets the current workspace.
+ * This will clear out any git tracked changes.
+ *
+ * Used internally to reset version number changes in package.json
+ */
+publish.clean = function () {
     execSync("git reset HEAD --hard");
 };
 
-publish.release = function () {
-    // publish to npm
-    // execSync("npm publish");
-    execSync("npm pack");
+/**
+ * Publishes a develpment build.
+ * This creates a release named after the version but with the build stamp,
+ * appended to the end in the format X.x.x-prerelease.yyyymmddThhmmssZ.shortHash
+ *
+ * @param isTest {Boolean} - indicates if this is a test run
+ */
+publish.dev = function (isTest) {
+    // Ensure no uncommitted changes
+    publish.checkChanges();
+
+    // set the version number
+    publish.setDevVersion();
+
+    publish.pubImpl(isTest);
+    publish.tag(isTest, publish.devVersion, "dev");
+
+    // cleanup changes
+    publish.clean();
+};
+
+/**
+ * Publishes a release build.
+ * This creates a release naved after the version in the package.json file.
+ * It will not increase the version number, this must be done separately.
+ *
+ * @param isTest {Boolean} - indicates if this is a test run
+ */
+publish.release = function (isTest) {
+    // Ensure no uncommitted changes
+    publish.checkChanges();
+
+    publish.pubImpl(isTest);
 };
 
 module.exports = publish.publish;
 
 if (require.main === module) {
 
-    publish.getCLIOpts();
-    publish.dev();
+    var opts = publish.getCLIOpts();
+    var isTest = opts["--test"] || true;
+
+    if (opts["--dev"]) {
+        publish.dev(isTest);
+    } else {
+        publish.release(isTest);
+    }
+
 }
