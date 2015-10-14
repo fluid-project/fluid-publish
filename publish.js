@@ -119,7 +119,7 @@ publish.convertoISO8601 = function (timestamp) {
 publish.checkChanges = function (options) {
     var cmdStr = options.changes || defaults.changes;
     var changes = execSync(cmdStr);
-    if (changes) {
+    if (changes.length) {
         throw new Error("You have uncommitted changes\n" + changes);
     }
 };
