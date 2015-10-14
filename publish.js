@@ -91,28 +91,24 @@ publish.checkChanges = function () {
     }
 };
 
-publish.dev = function (options) {
+publish.dev = function () {
     publish.checkChanges();
-    // if (publish.gitChanges.length) {
-    //     console.log("Error: you have uncommitted changes\n" + publish.gitChanges);
-    // } else {
-        // set the version number
-        execSync("npm version --no-git-tag-version " + publish.devVersion);
+    // set the version number
+    execSync("npm version --no-git-tag-version " + publish.devVersion);
 
-        // publish to npm
-        // execSync("npm publish");
-        execSync("npm pack");
+    // publish to npm
+    // execSync("npm publish");
+    execSync("npm pack");
 
-        // add dist-tag
-        // execSync("npm dist-tag add infusion@" + publish.devVersion + " dev");
-        console.log("npm dist-tag add infusion@" + publish.devVersion + " dev");
+    // add dist-tag
+    // execSync("npm dist-tag add infusion@" + publish.devVersion + " dev");
+    console.log("npm dist-tag add infusion@" + publish.devVersion + " dev");
 
-        // cleanup changes
-        execSync("git reset HEAD --hard");
-    // }
+    // cleanup changes
+    execSync("git reset HEAD --hard");
 };
 
-publish.release = function (options) {
+publish.release = function () {
     // publish to npm
     // execSync("npm publish");
     execSync("npm pack");

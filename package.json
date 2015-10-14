@@ -22,5 +22,10 @@
   "bugs": {
     "url": "https://github.com/jobara/publish/issues"
   },
-  "homepage": "http://fluidproject.org"
+  "homepage": "http://fluidproject.org",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "~0.9.0",
+    "grunt-jsonlint": "1.0.4"
+  }
 }
