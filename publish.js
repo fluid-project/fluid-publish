@@ -118,7 +118,7 @@ publish.convertoISO8601 = function (timestamp) {
  */
 publish.checkChanges = function (options) {
     var cmdStr = options.changes || defaults.changes;
-    var changes = execSync("git status -s -uno");
+    var changes = execSync(cmdStr);
     if (changes) {
         throw new Error("You have uncommitted changes\n" + changes);
     }
