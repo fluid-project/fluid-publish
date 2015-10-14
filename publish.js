@@ -12,8 +12,24 @@ https://github.com/fluid-project/first-discovery-server/raw/master/LICENSE.txt
 
 var pkg = require("./package.json");
 var execSync = require("child_process").execSync;
+// TODO: The supported version of node.js does not yet support ES6 template strings
+// When version node.js 4.x.x is supported this can be replaced by native support.
+var es6Template = require("es6-template-strings");
 
+var defaults = pkg.defaultOptions;
 var publish = {};
+
+// From dedupe-infusion ( https://github.com/fluid-project/dedupe-infusion )
+// Licensed under BSD-3-Clause
+publish.shallowMerge = function (target/*,  ... */) {
+    for (var arg = 1; arg < arguments.length; ++arg) {
+        var source = arguments[arg];
+        for (var key in source) {
+            target[key] = source[key];
+        }
+    }
+    return target;
+};
 
 /**
  * Processes the argv command line arguments into an object
@@ -97,26 +113,47 @@ publish.convertoISO8601 = function (timestamp) {
     return date.year + date.month + date.day + "T" + date.hours + date.minutes + date.seconds + "Z";
 };
 
-publish.gitChanges = execSync("git status -s -uno");
-publish.timestamp = execSync("git show -s --format=%ct HEAD");
-publish.commitHash = execSync("git rev-parse --verify --short HEAD");
-publish.devVersion = [pkg.version, publish.convertoISO8601(publish.timestamp), publish.commitHash].join(".");
-
 /**
  * Throws an error if there are any uncommitted changes
  */
-publish.checkChanges = function () {
-    if (publish.gitChanges.length) {
-        throw new Error("You have uncommitted changes\n" + publish.gitChanges);
+publish.checkChanges = function (options) {
+    var cmdStr = options.changes || defaults.changes;
+    var changes = execSync("git status -s -uno");
+    if (changes) {
+        throw new Error("You have uncommitted changes\n" + changes);
     }
 };
 
 /**
- * Updates the package.json version to the current dev release version
+ * Updates the package.json version to the specified version
  * This does not commit the change, it will only modify the file.
+ *
+ * @param version {String} - the version to set in the package.json file
+ * @param options {Object} - e.g. {"version": "npm version --no-git-tag-version ${version}"}
  */
-publish.setDevVersion = function () {
-    execSync("npm version --no-git-tag-version " + publish.devVersion);
+publish.setVersion = function (version, options) {
+    var cmdTemplate = options.version || defaults.version;
+    var cmdStr = es6Template(cmdTemplate, {
+        version: version
+    });
+    execSync(cmdStr);
+};
+
+/**
+ * Calculates the current dev version of the package
+ *
+ * @param options {Object} - e.g. {"rawTimestamp": "git show -s --format=%ct HEAD", "revision": "git rev-parse --verify --short HEAD", "devVersion": "${version}.${timestamp}.${revision}"}
+ * @returns {String} - the current dev version number
+ */
+publish.getDevVersion = function (options) {
+    var timestamp = execSync(options.rawTimestamp || defaults.rawTimestamp);
+    var revision = execSync(options.revision || defaults.revision);
+    var devVersionTemplate = options.devVersion || defaults.devVersion;
+    return es6Template(devVersionTemplate, {
+        version: pkg.verison,
+        timestamp: timestamp,
+        revision: revision
+    });
 };
 
 /**
@@ -124,14 +161,17 @@ publish.setDevVersion = function () {
  * If isTest is specified, it will instead create a tarball in the local directory.
  *
  * @param isTest {Boolean} - indicates if this is a test run or not
+ * @param options {Object} - e.g. {"pack": "npm pack", "publish": "npm publish"}
  */
-publish.pubImpl = function (isTest) {
+publish.pubImpl = function (isTest, options) {
     if (isTest) {
         // create a local tarball
-        execSync("npm pack");
+        var packCmd = options.pack || defaults.pack;
+        execSync(packCmd);
     } else {
         // publish to npm
-        execSync("npm publish");
+        var pubCmd = options.publish || defaults.publish;
+        execSync(pubCmd);
     }
 };
 
@@ -142,12 +182,18 @@ publish.pubImpl = function (isTest) {
  * @param isTest {Boolean} - indicates if this is a test run or not
  * @param version {String} - a string idicating which version to tag
  * @param tag {String} - the dist-tag to apply
+ * @param options {Object} - e.g. {"dist-tag": "npm dist-tag add infusion@${version} ${tag}"}
  */
-publish.tag = function (isTest, version, tag) {
+publish.tag = function (isTest, version, tag, options) {
+    var cmdTemplate = options.distTag || defaults.distTag;
+    var cmdStr = es6Template(cmdTemplate, {
+        version: version,
+        tag: tag
+    });
     if (isTest) {
-        console.log("npm dist-tag add infusion@" + version + " " + tag);
+        console.log("tag command: " + cmdStr);
     } else {
-        execSync("npm dist-tag add infusion@" + version + " " + tag);
+        execSync(cmdStr);
     }
 };
 
@@ -156,9 +202,11 @@ publish.tag = function (isTest, version, tag) {
  * This will clear out any git tracked changes.
  *
  * Used internally to reset version number changes in package.json
+ * @param options {Object} - e.g. {"clean": "git reset HEAD --hard"}
  */
-publish.clean = function () {
-    execSync("git reset HEAD --hard");
+publish.clean = function (options) {
+    var cmdStr = options.clean || defaults.clean;
+    execSync(cmdStr);
 };
 
 /**
@@ -167,19 +215,24 @@ publish.clean = function () {
  * appended to the end in the format X.x.x-prerelease.yyyymmddThhmmssZ.shortHash
  *
  * @param isTest {Boolean} - indicates if this is a test run
+ * @param options {Object} - see defaultOptions in package.json for possible values
  */
-publish.dev = function (isTest) {
+publish.dev = function (isTest, options) {
+    var opts = publish.shallowMerge({}, defaults, options);
+
     // Ensure no uncommitted changes
-    publish.checkChanges();
+    publish.checkChanges(opts);
+
+    var devVersion = publish.getDevVersion(opts);
 
     // set the version number
-    publish.setDevVersion();
+    publish.setVersion(devVersion, opts);
 
-    publish.pubImpl(isTest);
-    publish.tag(isTest, publish.devVersion, "dev");
+    publish.pubImpl(isTest, opts);
+    publish.tag(isTest, devVersion, opts.devTag, opts);
 
     // cleanup changes
-    publish.clean();
+    publish.clean(opts);
 };
 
 /**
@@ -188,12 +241,15 @@ publish.dev = function (isTest) {
  * It will not increase the version number, this must be done separately.
  *
  * @param isTest {Boolean} - indicates if this is a test run
+ * @param options {Object} - see defaultOptions in package.json for possible values
  */
-publish.release = function (isTest) {
-    // Ensure no uncommitted changes
-    publish.checkChanges();
+publish.release = function (isTest, options) {
+    var opts = publish.shallowMerge({}, defaults, options);
 
-    publish.pubImpl(isTest);
+    // Ensure no uncommitted changes
+    publish.checkChanges(opts);
+
+    publish.pubImpl(isTest, opts);
 };
 
 module.exports = publish.publish;
@@ -202,11 +258,12 @@ if (require.main === module) {
 
     var opts = publish.getCLIOpts();
     var isTest = opts["--test"] || true;
+    var options = JSON.parse(opts["--options"] || "{}");
 
     if (opts["--dev"]) {
-        publish.dev(isTest);
+        publish.dev(isTest, options);
     } else {
-        publish.release(isTest);
+        publish.release(isTest, options);
     }
 
 }
