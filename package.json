@@ -1,0 +1,26 @@
+{
+  "name": "publish",
+  "version": "0.1.0-dev",
+  "description": "A CLI tool for publishing a node package to npm",
+  "main": "publish.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jobara/publish.git"
+  },
+  "keywords": [
+    "npm",
+    "publish",
+    "node",
+    "module",
+    "CLI"
+  ],
+  "author": "Fluid Project",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/jobara/publish/issues"
+  },
+  "homepage": "http://fluidproject.org"
+}
