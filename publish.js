@@ -10,14 +10,14 @@ https://github.com/fluid-project/first-discovery-server/raw/master/LICENSE.txt
 
 "use strict";
 
+var publish = {};
 var pkg = require("./package.json");
-var execSync = require("child_process").execSync;
+publish.execSync = require("child_process").execSync;
 // TODO: The supported version of node.js does not yet support ES6 template strings
 // When version node.js 4.x.x is supported this can be replaced by native support.
 var es6Template = require("es6-template-strings");
 
 var defaults = pkg.defaultOptions;
-var publish = {};
 
 // From dedupe-infusion ( https://github.com/fluid-project/dedupe-infusion )
 // Licensed under BSD-3-Clause
@@ -101,7 +101,7 @@ publish.fromTimestamp = function (timestamp) {
  * @param timestamp {String} - timestamp in seconds as returned by "git show -s --format=%ct HEAD"
  * @returns {String} - the time in the ISO8601 format yyyymmddThhmmssZ
  */
-publish.convertoISO8601 = function (timestamp) {
+publish.convertToISO8601 = function (timestamp) {
     var date = publish.fromTimestamp(timestamp);
 
     for (var key in date) {
@@ -113,10 +113,13 @@ publish.convertoISO8601 = function (timestamp) {
 
 /**
  * Throws an error if there are any uncommitted changes
+ *
+ * @param options {Object} - e.g. {"changes": "git status -s -uno"}
+ * @throws Error - An error object with a message containing a list of uncommitted changes.
  */
 publish.checkChanges = function (options) {
     var cmdStr = options.changes || defaults.changes;
-    var changes = execSync(cmdStr);
+    var changes = publish.execSync(cmdStr);
     if (changes.length) {
         throw new Error("You have uncommitted changes\n" + changes);
     }
@@ -134,7 +137,7 @@ publish.setVersion = function (version, options) {
     var cmdStr = es6Template(cmdTemplate, {
         version: version
     });
-    execSync(cmdStr);
+    publish.execSync(cmdStr);
 };
 
 /**
@@ -144,9 +147,9 @@ publish.setVersion = function (version, options) {
  * @returns {String} - the current dev version number
  */
 publish.getDevVersion = function (options) {
-    var rawTimestamp = execSync(options.rawTimestamp || defaults.rawTimestamp);
-    var timestamp = publish.convertoISO8601(rawTimestamp);
-    var revision = execSync(options.revision || defaults.revision);
+    var rawTimestamp = publish.execSync(options.rawTimestamp || defaults.rawTimestamp);
+    var timestamp = publish.convertToISO8601(rawTimestamp);
+    var revision = publish.execSync(options.revision || defaults.revision);
     var devVersionTemplate = options.devVersion || defaults.devVersion;
     var newStr = es6Template(devVersionTemplate, {
         version: pkg.version,
@@ -167,11 +170,11 @@ publish.pubImpl = function (isTest, options) {
     if (isTest) {
         // create a local tarball
         var packCmd = options.pack || defaults.pack;
-        execSync(packCmd);
+        publish.execSync(packCmd);
     } else {
         // publish to npm
         var pubCmd = options.publish || defaults.publish;
-        execSync(pubCmd);
+        publish.execSync(pubCmd);
     }
 };
 
@@ -182,7 +185,7 @@ publish.pubImpl = function (isTest, options) {
  * @param isTest {Boolean} - indicates if this is a test run or not
  * @param version {String} - a string idicating which version to tag
  * @param tag {String} - the dist-tag to apply
- * @param options {Object} - e.g. {"dist-tag": "npm dist-tag add infusion@${version} ${tag}"}
+ * @param options {Object} - e.g. {"distTag": "npm dist-tag add infusion@${version} ${tag}"}
  */
 publish.tag = function (isTest, version, tag, options) {
     var cmdTemplate = options.distTag || defaults.distTag;
@@ -193,7 +196,7 @@ publish.tag = function (isTest, version, tag, options) {
     if (isTest) {
         console.log("tag command: " + cmdStr);
     } else {
-        execSync(cmdStr);
+        publish.execSync(cmdStr);
     }
 };
 
@@ -206,7 +209,7 @@ publish.tag = function (isTest, version, tag, options) {
  */
 publish.clean = function (options) {
     var cmdStr = options.clean || defaults.clean;
-    execSync(cmdStr);
+    publish.execSync(cmdStr);
 };
 
 /**
@@ -252,7 +255,7 @@ publish.release = function (isTest, options) {
     publish.pubImpl(isTest, opts);
 };
 
-module.exports = publish.publish;
+module.exports = publish;
 
 if (require.main === module) {
 
