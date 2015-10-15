@@ -43,7 +43,6 @@ publish.getCLIOpts = function () {
     // print process.argv
     process.argv.forEach(function(val, index) {
         if (index > 1) {
-            // console.log(index + ': ' + val);
             var opt = val.split("=");
 
             // convert "false" to boolean
@@ -54,7 +53,6 @@ publish.getCLIOpts = function () {
             opts[opt[0]] = opt.length < 2 ? true : opt[1];
         }
     });
-    console.log("opts: " + JSON.stringify(opts));
     return opts;
 };
 
@@ -146,14 +144,16 @@ publish.setVersion = function (version, options) {
  * @returns {String} - the current dev version number
  */
 publish.getDevVersion = function (options) {
-    var timestamp = execSync(options.rawTimestamp || defaults.rawTimestamp);
+    var rawTimestamp = execSync(options.rawTimestamp || defaults.rawTimestamp);
+    var timestamp = publish.convertoISO8601(rawTimestamp);
     var revision = execSync(options.revision || defaults.revision);
     var devVersionTemplate = options.devVersion || defaults.devVersion;
-    return es6Template(devVersionTemplate, {
-        version: pkg.verison,
+    var newStr = es6Template(devVersionTemplate, {
+        version: pkg.version,
         timestamp: timestamp,
         revision: revision
     });
+    return newStr;
 };
 
 /**
@@ -257,7 +257,7 @@ module.exports = publish.publish;
 if (require.main === module) {
 
     var opts = publish.getCLIOpts();
-    var isTest = opts["--test"] || true;
+    var isTest = opts["--test"];
     var options = JSON.parse(opts["--options"] || "{}");
 
     if (opts["--dev"]) {
