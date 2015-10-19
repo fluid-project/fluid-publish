@@ -12,24 +12,17 @@ https://github.com/fluid-project/first-discovery-server/raw/master/LICENSE.txt
 
 var publish = {};
 var pkg = require("./package.json");
+var extend = require("extend");
+
+// execSync is added to the exported "publish" namespace so that it can be
+// stubbed in the tests.
 publish.execSync = require("child_process").execSync;
+
 // TODO: The supported version of node.js does not yet support ES6 template strings
 // When version node.js 4.x.x is supported this can be replaced by native support.
 var es6Template = require("es6-template-strings");
 
 var defaults = pkg.defaultOptions;
-
-// From dedupe-infusion ( https://github.com/fluid-project/dedupe-infusion )
-// Licensed under BSD-3-Clause
-publish.shallowMerge = function (target/*,  ... */) {
-    for (var arg = 1; arg < arguments.length; ++arg) {
-        var source = arguments[arg];
-        for (var key in source) {
-            target[key] = source[key];
-        }
-    }
-    return target;
-};
 
 /**
  * Processes the argv command line arguments into an object
@@ -221,7 +214,7 @@ publish.clean = function (options) {
  * @param options {Object} - see defaultOptions in package.json for possible values
  */
 publish.dev = function (isTest, options) {
-    var opts = publish.shallowMerge({}, defaults, options);
+    var opts = extend(true, {}, defaults, options);
 
     // Ensure no uncommitted changes
     publish.checkChanges(opts);
@@ -247,7 +240,7 @@ publish.dev = function (isTest, options) {
  * @param options {Object} - see defaultOptions in package.json for possible values
  */
 publish.release = function (isTest, options) {
-    var opts = publish.shallowMerge({}, defaults, options);
+    var opts = extend(true, {}, defaults, options);
 
     // Ensure no uncommitted changes
     publish.checkChanges(opts);

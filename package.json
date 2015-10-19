@@ -27,7 +27,8 @@
   },
   "homepage": "http://fluidproject.org",
   "dependencies": {
-    "es6-template-strings": "2.0.0"
+    "es6-template-strings": "2.0.0",
+    "extend": "^3.0.0"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
