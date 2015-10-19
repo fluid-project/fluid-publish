@@ -172,12 +172,14 @@ publish.dev();
             <td>
                 The CLI to execute which tags an NPM release.
 
+                `${packageName}` will be substituted with executing module's name.
+
                 `${version}` will be substituted with the generated dev build version.
 
                 `${tag}` will be substituted with the value from the `devTag` option.
             </td>
             <td>
-                "npm dist-tag add infusion@${version} ${tag}"
+                "npm dist-tag add ${packageName}@${version} ${tag}"
 
                 <em><strong>NOTE</strong>: This command will update the version in the package.json file, but will not commit the change.</em>
             </td>

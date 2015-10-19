@@ -14,6 +14,10 @@ var publish = {};
 var pkg = require("./package.json");
 var extend = require("extend");
 
+// The package.json file of the top level package which is
+// running this module.
+var modulePkg = require(process.cwd() + "/package.json");
+
 // execSync  and log are added to the exported "publish" namespace so they can
 // be stubbed in the tests.
 publish.execSync = require("child_process").execSync;
@@ -155,6 +159,16 @@ publish.getDevVersion = function (options) {
 };
 
 /**
+ * Retrieves the name of the executing module.
+ *
+ * @returns {String} - the name of the executing module, as sourced from its
+ *                     package.json file.
+ */
+publish.getPackageName = function () {
+    return modulePkg.name;
+};
+
+/**
  * Publishes the module to npm using the current version number in pacakge.json.
  * If isTest is specified, it will instead create a tarball in the local directory.
  *
@@ -180,11 +194,12 @@ publish.pubImpl = function (isTest, options) {
  * @param isTest {Boolean} - indicates if this is a test run or not
  * @param version {String} - a string indicating which version to tag
  * @param tag {String} - the dist-tag to apply
- * @param options {Object} - e.g. {"distTagCmd": "npm dist-tag add infusion@${version} ${tag}"}
+ * @param options {Object} - e.g. "npm dist-tag add ${packageName}@${version} ${tag}"
  */
-publish.tag = function (isTest, version, tag, options) {
+publish.tag = function (isTest, packageName, version, tag, options) {
     var cmdTemplate = options.distTagCmd || defaults.distTagCmd;
     var cmdStr = es6Template(cmdTemplate, {
+        packageName: packageName,
         version: version,
         tag: tag
     });
@@ -224,12 +239,13 @@ publish.dev = function (isTest, options) {
     publish.checkChanges(opts);
 
     var devVersion = publish.getDevVersion(opts);
+    var packageName = publish.getPackageName();
 
     // set the version number
     publish.setVersion(devVersion, opts);
 
     publish.pubImpl(isTest, opts);
-    publish.tag(isTest, devVersion, opts.devTag, opts);
+    publish.tag(isTest, packageName, devVersion, opts.devTag, opts);
 
     // cleanup changes
     publish.clean(opts);

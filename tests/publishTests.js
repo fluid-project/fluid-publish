@@ -208,30 +208,33 @@ console.log("\n*** publish.tag ***");
 
 var tagFixture = [{
     isTest: true,
+    packageName: "test1",
     version: "1.0.0",
     tag: "tag",
-    distTagCmd: "add tag ${tag} to ${version}",
-    expected: "tag command: add tag tag to 1.0.0"
+    distTagCmd: "add tag ${tag} to ${packageName} at ${version}",
+    expected: "tag command: add tag tag to test1 at 1.0.0"
 }, {
     isTest: false,
+    packageName: "test2",
     version: "2.0.0",
     tag: "tag2",
-    distTagCmd: "add tag ${tag} to ${version}",
-    expected: "add tag tag2 to 2.0.0"
+    distTagCmd: "add tag ${tag} to ${packageName} at ${version}",
+    expected: "add tag tag2 to test2 at 2.0.0"
 }, {
     version: "3.0.0",
+    packageName: "test3",
     tag: "tag3",
-    distTagCmd: "add tag ${tag} to ${version}",
-    expected: "add tag tag3 to 3.0.0"
+    distTagCmd: "add tag ${tag} to ${packageName} at ${version}",
+    expected: "add tag tag3 to test3 at 3.0.0"
 }];
 
 tagFixture.forEach(function (fixture) {
-    console.log("tag test - isTest: " + fixture.isTest + " version: " + fixture.version + " tag: " + fixture.tag + " distTagCmd: " + fixture.distTagCmd);
+    console.log("tag test - isTest: " + fixture.isTest + " packageName: " + fixture.packageName + " version: " + fixture.version + " tag: " + fixture.tag + " distTagCmd: " + fixture.distTagCmd);
 
     var exec = sinon.stub(publish, "execSync");
     var log = sinon.stub(publish, "log");
 
-    publish.tag(fixture.isTest, fixture.version, fixture.tag, fixture);
+    publish.tag(fixture.isTest, fixture.packageName, fixture.version, fixture.tag, fixture);
 
     if (fixture.isTest) {
         assert(log.calledOnce, "console.log should have been called");
@@ -308,10 +311,13 @@ publishFixture.forEach(function (fixture) {
     var optsString = JSON.stringify(fixture.options || {});
     console.log("dev test - isTest: " + fixture.isTest, " options: " + optsString + "\n");
 
-    var toStub = ["checkChanges", "getDevVersion", "setVersion", "pubImpl", "tag", "clean"];
+    var toStub = ["checkChanges", "getPackageName", "getDevVersion", "setVersion", "pubImpl", "tag", "clean"];
     var stub = createStubs(publish, toStub);
     var devVersion = "1.0.0-testVersion";
+    var packageName = "testPkg";
+
     stub.getDevVersion.returns(devVersion);
+    stub.getPackageName.returns(packageName);
 
     publish.dev(fixture.isTest, fixture.options);
 
@@ -323,7 +329,7 @@ publishFixture.forEach(function (fixture) {
     assert(stub.pubImpl.calledOnce, "pubImpl should have been called");
     assert(stub.pubImpl.calledWith(fixture.isTest, fixture.options), "pubImpl should have been called with: " + fixture.isTest + ", " + optsString);
     assert(stub.tag.calledOnce, "tag should have been called");
-    assert(stub.tag.calledWith(fixture.isTest, devVersion, fixture.options.devTag, fixture.options), "tag should have been called with: " + fixture.isTest + ", " + devVersion + ", " + fixture.options.devTag + ", " + optsString);
+    assert(stub.tag.calledWith(fixture.isTest, packageName, devVersion, fixture.options.devTag, fixture.options), "tag should have been called with: " + fixture.isTest + ", " + packageName + ", " + devVersion + ", " + fixture.options.devTag + ", " + optsString);
     assert(stub.clean.calledOnce, "clean should have been called");
     assert(stub.clean.calledWith(fixture.options), "clean should have been called with: " + optsString);
 

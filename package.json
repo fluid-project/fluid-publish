@@ -44,7 +44,7 @@
     "packCmd": "npm pack",
     "publishCmd": "npm publish",
     "versionCmd": "npm version --no-git-tag-version ${version}",
-    "distTagCmd": "npm dist-tag add infusion@${version} ${tag}",
+    "distTagCmd": "npm dist-tag add ${packageName}@${version} ${tag}",
     "cleanCmd": "git checkout -- package.json",
     "devVersion": "${version}.${timestamp}.${revision}",
     "devTag": "dev"
