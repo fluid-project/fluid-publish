@@ -210,7 +210,8 @@ publish.clean = function (options) {
 /**
  * Publishes a develpment build.
  * This creates a release named after the version but with the build stamp,
- * appended to the end in the format X.x.x-prerelease.yyyymmddThhmmssZ.shortHash
+ * appended to the end in the format X.x.x-prerelease.yyyymmddThhmmssZ.shortHash,
+ * where prerelease is taken from the devTag option and devfaults to "dev".
  *
  * @param isTest {Boolean} - indicates if this is a test run
  * @param options {Object} - see defaultOptions in package.json for possible values
