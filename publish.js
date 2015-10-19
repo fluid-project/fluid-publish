@@ -235,7 +235,7 @@ publish.dev = function (isTest, options) {
 
 /**
  * Publishes a release build.
- * This creates a release naved after the version in the package.json file.
+ * This creates a release named after the version in the package.json file.
  * It will not increase the version number, this must be done separately.
  *
  * @param isTest {Boolean} - indicates if this is a test run
