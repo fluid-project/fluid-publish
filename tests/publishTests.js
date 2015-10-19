@@ -229,7 +229,7 @@ tagFixture.forEach(function (fixture) {
     console.log("tag test - isTest: " + fixture.isTest + " version: " + fixture.version + " tag: " + fixture.tag + " distTagCmd: " + fixture.distTagCmd);
 
     var exec = sinon.stub(publish, "execSync");
-    var log = sinon.stub(console, "log");
+    var log = sinon.stub(publish, "log");
 
     publish.tag(fixture.isTest, fixture.version, fixture.tag, fixture);
 
@@ -245,7 +245,7 @@ tagFixture.forEach(function (fixture) {
 
     // remove execSync and log stubs
     publish.execSync.restore();
-    console.log.restore();
+    publish.log.restore();
 });
 
 // publish.clean

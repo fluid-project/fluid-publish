@@ -14,9 +14,10 @@ var publish = {};
 var pkg = require("./package.json");
 var extend = require("extend");
 
-// execSync is added to the exported "publish" namespace so that it can be
-// stubbed in the tests.
+// execSync  and log are added to the exported "publish" namespace so they can
+// be stubbed in the tests.
 publish.execSync = require("child_process").execSync;
+publish.log = console.log;
 
 // TODO: The supported version of node.js does not yet support ES6 template strings
 // When version node.js 4.x.x is supported this can be replaced by native support.
@@ -188,7 +189,7 @@ publish.tag = function (isTest, version, tag, options) {
         tag: tag
     });
     if (isTest) {
-        console.log("tag command: " + cmdStr);
+        publish.log("tag command: " + cmdStr);
     } else {
         publish.execSync(cmdStr);
     }
