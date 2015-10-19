@@ -69,7 +69,7 @@ publish.release();
 Publishes a development build. This creates a release named after the version, but with the build stamp appended to the end. By default this will create a release with version X.x.x-prerelease.yyyymmddThhmmssZ.shortHash where x.x.x-prerelease is sourced from the version number in the package.json file and the build identifier (yyyymmddThhmmssZ.shortHash) is generated based on the latest commit.
 
 ```javascript
-var publish = rquire("publish");
+var publish = require("publish");
 publish.dev();
 ```
 
@@ -162,7 +162,7 @@ publish.dev();
             <td>
                 "npm version --no-git-tag-version ${version}"
 
-                <em><strong>NOTE</strong>: This command will updated the version in the package.json file, but will not commit the change.</em>
+                <em><strong>NOTE</strong>: This command will update the version in the package.json file, but will not commit the change.</em>
             </td>
         </tr>
         <tr>
@@ -179,7 +179,7 @@ publish.dev();
             <td>
                 "npm dist-tag add infusion@${version} ${tag}"
 
-                <em><strong>NOTE</strong>: This command will updated the version in the package.json file, but will not commit the change.</em>
+                <em><strong>NOTE</strong>: This command will update the version in the package.json file, but will not commit the change.</em>
             </td>
         </tr>
         <tr>

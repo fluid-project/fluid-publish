@@ -51,7 +51,7 @@ publish.getCLIOpts = function () {
 };
 
 /**
- * Creaes a number with 0's padded on the left
+ * Creates a number with 0's padded on the left
  *
  * @param num {Number}
  * @param width {Number} - the min-width of the number (default is 2),
@@ -178,7 +178,7 @@ publish.pubImpl = function (isTest, options) {
  * If it is a test run, the tag command will be output to the console.
  *
  * @param isTest {Boolean} - indicates if this is a test run or not
- * @param version {String} - a string idicating which version to tag
+ * @param version {String} - a string indicating which version to tag
  * @param tag {String} - the dist-tag to apply
  * @param options {Object} - e.g. {"distTagCmd": "npm dist-tag add infusion@${version} ${tag}"}
  */
@@ -196,8 +196,7 @@ publish.tag = function (isTest, version, tag, options) {
 };
 
 /**
- * Resets the current workspace.
- * This will clear out any git tracked changes.
+ * Restore the package.json file to the latest committed version.
  *
  * Used internally to reset version number changes in package.json
  * @param options {Object} - e.g. {"cleanCmd": "git reset HEAD --hard"}
