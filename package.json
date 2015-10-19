@@ -44,7 +44,7 @@
     "publishCmd": "npm publish",
     "versionCmd": "npm version --no-git-tag-version ${version}",
     "distTagCmd": "npm dist-tag add infusion@${version} ${tag}",
-    "cleanCmd": "git reset HEAD --hard",
+    "cleanCmd": "git checkout -- package.json",
     "devVersion": "${version}.${timestamp}.${revision}",
     "devTag": "dev"
   }
