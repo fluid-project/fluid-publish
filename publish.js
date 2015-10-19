@@ -108,11 +108,11 @@ publish.convertToISO8601 = function (timestamp) {
 /**
  * Throws an error if there are any uncommitted changes
  *
- * @param options {Object} - e.g. {"changes": "git status -s -uno"}
+ * @param options {Object} - e.g. {"changesCmd": "git status -s -uno"}
  * @throws Error - An error object with a message containing a list of uncommitted changes.
  */
 publish.checkChanges = function (options) {
-    var cmdStr = options.changes || defaults.changes;
+    var cmdStr = options.changesCmd || defaults.changesCmd;
     var changes = publish.execSync(cmdStr);
     if (changes.length) {
         throw new Error("You have uncommitted changes\n" + changes);
@@ -124,10 +124,10 @@ publish.checkChanges = function (options) {
  * This does not commit the change, it will only modify the file.
  *
  * @param version {String} - the version to set in the package.json file
- * @param options {Object} - e.g. {"version": "npm version --no-git-tag-version ${version}"}
+ * @param options {Object} - e.g. {"versionCmd": "npm version --no-git-tag-version ${version}"}
  */
 publish.setVersion = function (version, options) {
-    var cmdTemplate = options.version || defaults.version;
+    var cmdTemplate = options.versionCmd || defaults.versionCmd;
     var cmdStr = es6Template(cmdTemplate, {
         version: version
     });
@@ -137,13 +137,13 @@ publish.setVersion = function (version, options) {
 /**
  * Calculates the current dev version of the package
  *
- * @param options {Object} - e.g. {"rawTimestamp": "git show -s --format=%ct HEAD", "revision": "git rev-parse --verify --short HEAD", "devVersion": "${version}.${timestamp}.${revision}"}
+ * @param options {Object} - e.g. {"rawTimestampCmd": "git show -s --format=%ct HEAD", "revisionCmd": "git rev-parse --verify --short HEAD", "devVersion": "${version}.${timestamp}.${revision}"}
  * @returns {String} - the current dev version number
  */
 publish.getDevVersion = function (options) {
-    var rawTimestamp = publish.execSync(options.rawTimestamp || defaults.rawTimestamp);
+    var rawTimestamp = publish.execSync(options.rawTimestampCmd || defaults.rawTimestampCmd);
     var timestamp = publish.convertToISO8601(rawTimestamp);
-    var revision = publish.execSync(options.revision || defaults.revision);
+    var revision = publish.execSync(options.revisionCmd || defaults.revisionCmd);
     var devVersionTemplate = options.devVersion || defaults.devVersion;
     var newStr = es6Template(devVersionTemplate, {
         version: pkg.version,
@@ -158,17 +158,17 @@ publish.getDevVersion = function (options) {
  * If isTest is specified, it will instead create a tarball in the local directory.
  *
  * @param isTest {Boolean} - indicates if this is a test run or not
- * @param options {Object} - e.g. {"pack": "npm pack", "publish": "npm publish"}
+ * @param options {Object} - e.g. {"packCmd": "npm pack", "publishCmd": "npm publish"}
  */
 publish.pubImpl = function (isTest, options) {
     if (isTest) {
         // create a local tarball
-        var packCmd = options.pack || defaults.pack;
+        var packCmd = options.packCmd || defaults.packCmd;
         publish.execSync(packCmd);
     } else {
         // publish to npm
-        var pubCmd = options.publish || defaults.publish;
-        publish.execSync(pubCmd);
+        var publishCmd = options.publishCmd || defaults.publishCmd;
+        publish.execSync(publishCmd);
     }
 };
 
@@ -179,10 +179,10 @@ publish.pubImpl = function (isTest, options) {
  * @param isTest {Boolean} - indicates if this is a test run or not
  * @param version {String} - a string idicating which version to tag
  * @param tag {String} - the dist-tag to apply
- * @param options {Object} - e.g. {"distTag": "npm dist-tag add infusion@${version} ${tag}"}
+ * @param options {Object} - e.g. {"distTagCmd": "npm dist-tag add infusion@${version} ${tag}"}
  */
 publish.tag = function (isTest, version, tag, options) {
-    var cmdTemplate = options.distTag || defaults.distTag;
+    var cmdTemplate = options.distTagCmd || defaults.distTagCmd;
     var cmdStr = es6Template(cmdTemplate, {
         version: version,
         tag: tag
@@ -199,10 +199,10 @@ publish.tag = function (isTest, version, tag, options) {
  * This will clear out any git tracked changes.
  *
  * Used internally to reset version number changes in package.json
- * @param options {Object} - e.g. {"clean": "git reset HEAD --hard"}
+ * @param options {Object} - e.g. {"cleanCmd": "git reset HEAD --hard"}
  */
 publish.clean = function (options) {
-    var cmdStr = options.clean || defaults.clean;
+    var cmdStr = options.cleanCmd || defaults.cleanCmd;
     publish.execSync(cmdStr);
 };
 

@@ -37,14 +37,14 @@
     "sinon": "^1.17.1"
   },
   "defaultOptions": {
-    "changes": "git status -s -uno",
-    "rawTimestamp": "git show -s --format=%ct HEAD",
-    "revision": "git rev-parse --verify --short HEAD",
-    "pack": "npm pack",
-    "publish": "npm publish",
-    "version": "npm version --no-git-tag-version ${version}",
-    "distTag": "npm dist-tag add infusion@${version} ${tag}",
-    "clean": "git reset HEAD --hard",
+    "changesCmd": "git status -s -uno",
+    "rawTimestampCmd": "git show -s --format=%ct HEAD",
+    "revisionCmd": "git rev-parse --verify --short HEAD",
+    "packCmd": "npm pack",
+    "publishCmd": "npm publish",
+    "versionCmd": "npm version --no-git-tag-version ${version}",
+    "distTagCmd": "npm dist-tag add infusion@${version} ${tag}",
+    "cleanCmd": "git reset HEAD --hard",
     "devVersion": "${version}.${timestamp}.${revision}",
     "devTag": "dev"
   }

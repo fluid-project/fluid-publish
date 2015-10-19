@@ -109,7 +109,7 @@ checkChangesFixture.forEach(function (fixture) {
     exec.returns(fixture.cmdReturn);
 
     try {
-        publish.checkChanges({changes: fixture.cmdStr});
+        publish.checkChanges({changesCmd: fixture.cmdStr});
         assert(exec.called, "execSync should have been called");
         assert(exec.calledWith(fixture.cmdStr), "execSync should have been called with: " + fixture.cmdStr);
 
@@ -126,16 +126,16 @@ console.log("\n*** publish.setVersion ***");
 
 var setVersionFixture = [{
     version: "1.0.0",
-    cmdStr: "set version: ${version}",
+    versionCmd: "set version: ${version}",
     expected: "set version: 1.0.0"
 }];
 
 setVersionFixture.forEach(function (fixture) {
-    console.log("setVersion test - version: " + fixture.version + " cmdStr: " + fixture.cmdStr);
+    console.log("setVersion test - version: " + fixture.version + " versionCmd: " + fixture.versionCmd);
 
     var exec = sinon.stub(publish, "execSync");
 
-    publish.setVersion(fixture.version, {version: fixture.cmdStr});
+    publish.setVersion(fixture.version, fixture);
     assert(exec.called, "execSync should have been called");
     assert(exec.calledWith(fixture.expected), "execSync should have been called with: " + fixture.expected);
 
@@ -147,8 +147,8 @@ setVersionFixture.forEach(function (fixture) {
 console.log("\n*** publish.getDevVersion ***");
 
 var getDevVersionFixture = [{
-    rawTimestamp: "get raw timestamp",
-    revision: "get revision",
+    rawTimestampCmd: "get raw timestamp",
+    revisionCmd: "get revision",
     devVersion: "${timestamp}.${revision}",
     expectedVersion: "20151015T131223Z.039d221",
     returnedTimestamp: 1444914743,
@@ -156,7 +156,7 @@ var getDevVersionFixture = [{
 }];
 
 getDevVersionFixture.forEach(function (fixture) {
-    console.log("getDevVersion test - rawTimestamp: " + fixture.rawTimestamp + " revision: " + fixture.revision + " devVersion: " + fixture.devVersion);
+    console.log("getDevVersion test - rawTimestampCmd: " + fixture.rawTimestampCmd + " revisionCmd: " + fixture.revisionCmd + " devVersion: " + fixture.devVersion);
 
     var exec = sinon.stub(publish, "execSync");
     exec.onFirstCall().returns(fixture.returnedTimestamp);
@@ -165,8 +165,8 @@ getDevVersionFixture.forEach(function (fixture) {
     var result = publish.getDevVersion(fixture);
 
     assert(exec.calledTwice, "execSync should have been called twice");
-    assert(exec.calledWith(fixture.rawTimestamp), "first execSync should have been called with: " + fixture.rawTimestamp);
-    assert(exec.calledWith(fixture.revision), "second execSync should have been called with: " + fixture.revision);
+    assert(exec.calledWith(fixture.rawTimestampCmd), "first execSync should have been called with: " + fixture.rawTimestampCmd);
+    assert(exec.calledWith(fixture.revisionCmd), "second execSync should have been called with: " + fixture.revisionCmd);
     assert.equal(result, fixture.expectedVersion, "Expected version: " + fixture.expectedVersion + " actual: " + result);
 
     // remove execSync stub
@@ -178,22 +178,22 @@ console.log("\n*** publish.pubImpl ***");
 
 var pubImplFixture = [{
     isTest: true,
-    pack: "pack",
-    publish: "shouldn't publish"
+    packCmd: "pack",
+    publishCmd: "shouldn't publish"
 }, {
     isTest: false,
-    pack: "shouldn't pack",
-    publish: "publish"
+    packCmd: "shouldn't pack",
+    publishCmd: "publish"
 }, {
-    pack: "shouldn't pack",
-    publish: "publish"
+    packCmd: "shouldn't pack",
+    publishCmd: "publish"
 }];
 
 pubImplFixture.forEach(function (fixture) {
-    console.log("pubImpl test - isTest: " + fixture.isTest + " pack: " + fixture.pack + " publish: " + fixture.publish);
+    console.log("pubImpl test - isTest: " + fixture.isTest + " packCmd: " + fixture.packCmd + " publishCmd: " + fixture.publishCmd);
 
     var exec = sinon.stub(publish, "execSync");
-    var expected = fixture[fixture.isTest ? "pack" : "publish"];
+    var expected = fixture[fixture.isTest ? "packCmd" : "publishCmd"];
 
     publish.pubImpl(fixture.isTest, fixture);
     assert(exec.calledOnce, "execSync should have been called");
@@ -210,23 +210,23 @@ var tagFixture = [{
     isTest: true,
     version: "1.0.0",
     tag: "tag",
-    distTag: "add tag ${tag} to ${version}",
+    distTagCmd: "add tag ${tag} to ${version}",
     expected: "tag command: add tag tag to 1.0.0"
 }, {
     isTest: false,
     version: "2.0.0",
     tag: "tag2",
-    distTag: "add tag ${tag} to ${version}",
+    distTagCmd: "add tag ${tag} to ${version}",
     expected: "add tag tag2 to 2.0.0"
 }, {
     version: "3.0.0",
     tag: "tag3",
-    distTag: "add tag ${tag} to ${version}",
+    distTagCmd: "add tag ${tag} to ${version}",
     expected: "add tag tag3 to 3.0.0"
 }];
 
 tagFixture.forEach(function (fixture) {
-    console.log("tag test - isTest: " + fixture.isTest + " version: " + fixture.version + " tag: " + fixture.tag + " distTag: " + fixture.distTag);
+    console.log("tag test - isTest: " + fixture.isTest + " version: " + fixture.version + " tag: " + fixture.tag + " distTagCmd: " + fixture.distTagCmd);
 
     var exec = sinon.stub(publish, "execSync");
     var log = sinon.stub(console, "log");
@@ -252,18 +252,18 @@ tagFixture.forEach(function (fixture) {
 console.log("\n*** publish.clean ***");
 
 var cleanFixture = [{
-    clean: "clean command"
+    cleanCmd: "clean command"
 }];
 
 cleanFixture.forEach(function (fixture) {
-    console.log("clean test - clean: " + fixture.clean);
+    console.log("clean test - cleanCmd: " + fixture.cleanCmd);
 
     var exec = sinon.stub(publish, "execSync");
 
     publish.clean(fixture);
 
     assert(exec.calledOnce, "execSync should have been called");
-    assert(exec.calledWith(fixture.clean), "execSync should have been called with: " + fixture.clean);
+    assert(exec.calledWith(fixture.cleanCmd), "execSync should have been called with: " + fixture.cleanCmd);
 
     // remove execSync stub
     publish.execSync.restore();
@@ -274,28 +274,28 @@ cleanFixture.forEach(function (fixture) {
 var publishFixture = [{
     isTest: true,
     options: {
-        "changes": "dry run get changes",
-        "rawTimestamp": "dry run get rawTimestamp",
-        "revision": "dry run get revision",
-        "pack": "dry run pack",
-        "publish": "dry run publish",
-        "version": "dry run version",
-        "distTag": "dry run set tag",
-        "clean": "dry run clean",
+        "changesCmd": "dry run get changes",
+        "rawTimestampCmd": "dry run get rawTimestamp",
+        "revisionCmd": "dry run get revision",
+        "packCmd": "dry run pack",
+        "publishCmd": "dry run publish",
+        "versionCmd": "dry run version",
+        "distTagCmd": "dry run set tag",
+        "cleanCmd": "dry run clean",
         "devVersion": "dry run ${version}.${timestamp}.${revision}",
         "devTag": "dry run dev"
     }
 }, {
     isTest: false,
     options: {
-        "changes": "get changes",
-        "rawTimestamp": "get rawTimestamp",
-        "revision": "get revision",
-        "pack": "pack",
-        "publish": "publish",
-        "version": "version",
-        "distTag": "set tag",
-        "clean": "clean",
+        "changesCmd": "get changes",
+        "rawTimestampCmd": "get rawTimestamp",
+        "revisionCmd": "get revision",
+        "packCmd": "pack",
+        "publishCmd": "publish",
+        "versionCmd": "version",
+        "distTagCmd": "set tag",
+        "cleanCmd": "clean",
         "devVersion": "${version}.${timestamp}.${revision}",
         "devTag": "dev"
     }
