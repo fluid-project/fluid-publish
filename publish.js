@@ -53,8 +53,8 @@ publish.getCLIOpts = function () {
  * Creaes a number with 0's padded on the left
  *
  * @param num {Number}
- * @param with {Number} - the min-width of the number,
- *                        if the number is shorter it will be padded with zeros on the left
+ * @param width {Number} - the min-width of the number (default is 2),
+ *                        if the number is shorter it will be padded with zeros on the left.
  * @returns {String} - a string representation of the number with padding as needed
  */
 publish.padZeros = function (num, width) {
