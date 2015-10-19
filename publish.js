@@ -89,7 +89,8 @@ publish.fromTimestamp = function (timestamp) {
 };
 
 /**
- * Converts a git timestamp into an ISO8601 timestamp
+ * Converts a git timestamp into a particular profile of ISO8601 timestamp,
+ * with the format yyyymmddThhmmssZ
  *
  * @param timestamp {String} - timestamp in seconds as returned by "git show -s --format=%ct HEAD"
  * @returns {String} - the time in the ISO8601 format yyyymmddThhmmssZ
