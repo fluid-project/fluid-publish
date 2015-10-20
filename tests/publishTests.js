@@ -337,8 +337,8 @@ publishFixture.forEach(function (fixture) {
     removeStubs(publish, toStub);
 });
 
-// publish.release
-console.log("\n*** publish.release ***");
+// publish.standard
+console.log("\n*** publish.standard ***");
 
 publishFixture.forEach(function (fixture) {
     var optsString = JSON.stringify(fixture.options || {});
@@ -347,7 +347,7 @@ publishFixture.forEach(function (fixture) {
     var toStub = ["checkChanges", "pubImpl"];
     var stub = createStubs(publish, toStub);
 
-    publish.release(fixture.isTest, fixture.options);
+    publish.standard(fixture.isTest, fixture.options);
 
     assert(stub.checkChanges.calledOnce, "checkChanges should have been called");
     assert(stub.pubImpl.calledOnce, "pubImpl should have been called");

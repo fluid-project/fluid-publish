@@ -255,14 +255,14 @@ publish.dev = function (isTest, options) {
 };
 
 /**
- * Publishes a release build.
+ * Publishes a standard release build.
  * This creates a release named after the version in the package.json file.
  * It will not increase the version number, this must be done separately.
  *
  * @param isTest {Boolean} - indicates if this is a test run
  * @param options {Object} - see defaultOptions in package.json for possible values
  */
-publish.release = function (isTest, options) {
+publish.standard = function (isTest, options) {
     var opts = extend(true, {}, defaults, options);
 
     // Ensure no uncommitted changes
@@ -279,10 +279,10 @@ if (require.main === module) {
     var isTest = opts["--test"];
     var options = JSON.parse(opts["--options"] || "{}");
 
-    if (opts["--dev"]) {
-        publish.dev(isTest, options);
+    if (opts["--standard"]) {
+        publish.standard(isTest, options);
     } else {
-        publish.release(isTest, options);
+        publish.dev(isTest, options);
     }
 
 }

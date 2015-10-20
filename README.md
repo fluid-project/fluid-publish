@@ -1,21 +1,23 @@
 # publish #
 A command line tool and node module that can be used to simplify the process of publishing a module to NPM. This is particularly useful for creating development releases, e.g. nightly or continuous integration releases.
 
+By default this will create a release with version __X.x.x-prerelease.yyyymmddThhmmssZ.shortHash__ where __X.x.x__ is sourced from the version number in the package.json file, __-prerelease__ is from the `devTag` option (also applied as a tag to the release), and the __yyyymmddThhmmssZ.shortHash__ build identifier is generated based on the latest commit.
+
 ## Usage ##
 
 ### Command Line ###
 
-#### --dev ####
+#### --standard ####
 
 __value__: true (Boolean)
 
-Specifies that a development release should be generated. By default this will create a release with version X.x.x-prerelease.yyyymmddThhmmssZ.shortHash where X.x.x is sourced from the version number in the package.json file, -prerelease is from the `devTag` option (also applied as a tag to the release), and the build identifier (yyyymmddThhmmssZ.shortHash) is generated based on the latest commit.
+Specifies that a standard release should be generated. This creates a release named after the version in the package.json file. It will not increase the version number, this must be done separately.
 
 ```bash
-# creates a dev release
-node publish.js --dev
+# creates a standard releases
+node publish.js --standard
 
-# creates a regular releases
+# creates a dev release
 node publish.js
 ```
 
@@ -28,11 +30,11 @@ Specifies that a tarball should be created instead of publishing to NPM. This is
 ```bash
 # creates a tarball
 node publish.js --test
-node publish.js --test --dev
+node publish.js --test --standard
 
 # publishes to NPM
 node publish.js
-node publish.js --dev
+node publish.js --standard
 ```
 
 #### --options #####
@@ -45,19 +47,10 @@ A stringified JSON object containing overrides to the default options used acros
 
 ```bash
 # publishes a dev build and applies the tag "nightly" to it
-node publish.js --dev --options="{'devTag': 'nightly'}"
+node publish.js --options="{'devTag': 'nightly'}"
 ```
 
 ### Node ###
-
-#### `release` ####
-
-Publishes a release build. This creates a release named after the version in the package.json file. By default it will not increase the version number, this must be done separately.
-
-```javascript
-var publish = require("publish");
-publish.release();
-```
 
 ##### parameters #####
 
@@ -77,6 +70,15 @@ publish.dev();
 
 * isTest {Boolean} - Indicates if this is a test run, if true a tarball will be generated instead of publishing to NPM.
 * options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key. (See: [Options](#options))
+
+#### `standard` ####
+
+Publishes a release build. This creates a release named after the version in the package.json file. By default it will not increase the version number, this must be done separately.
+
+```javascript
+var publish = require("publish");
+publish.standard();
+```
 
 ## Options ##
 
@@ -231,9 +233,9 @@ publish.dev();
 Publish can publish itself to NPM. This can be done using any of the [usage](#usage) methods described above, or via the NPM `pub` script defined in [package.json](package.json). The script makes use of the command line interface provided to interact with publish.js. However, with NPM you'll need to provide a set of "--" to identify arguments to the script.
 
 ```bash
-# publishes a regular release to NPM
+# publishes a dev release to NPM
 npm run pub
 
-# publishes a dev release to NPM
-npm run pub -- --dev
+# publishes a standard release to NPM
+npm run pub -- --standard
 ```
