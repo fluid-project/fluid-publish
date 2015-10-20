@@ -211,7 +211,10 @@ publish.tag = function (isTest, packageName, version, tag, options) {
  * @param options {Object} - e.g. {"cleanCmd": "git checkout -- ${package}"}
  */
 publish.clean = function (packagePath, options) {
-    var cmdStr = options.cleanCmd || defaults.cleanCmd;
+    var cmdTemplate = options.cleanCmd || defaults.cleanCmd;
+    var cmdStr = es6Template(cmdTemplate, {
+        package: packagePath
+    });
     publish.execSync(cmdStr);
 };
 

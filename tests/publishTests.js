@@ -259,7 +259,8 @@ console.log("\n*** publish.clean ***");
 
 var cleanFixture = [{
     packagePath: "path/to/package.json",
-    cleanCmd: "clean command"
+    cleanCmd: "clean ${package}",
+    expected: "clean path/to/package.json"
 }];
 
 cleanFixture.forEach(function (fixture) {
@@ -270,7 +271,7 @@ cleanFixture.forEach(function (fixture) {
     publish.clean(fixture.packagePath, fixture);
 
     assert(exec.calledOnce, "execSync should have been called");
-    assert(exec.calledWith(fixture.cleanCmd), "execSync should have been called with: " + fixture.cleanCmd);
+    assert(exec.calledWith(fixture.expected), "execSync should have been called with: " + fixture.expected);
 
     // remove execSync stub
     publish.execSync.restore();
