@@ -213,7 +213,7 @@ publish.tag = function (isTest, packageName, version, tag, options) {
 publish.clean = function (packagePath, options) {
     var cmdTemplate = options.cleanCmd || defaults.cleanCmd;
     var cmdStr = es6Template(cmdTemplate, {
-        package: packagePath
+        "package": packagePath
     });
     publish.execSync(cmdStr);
 };
