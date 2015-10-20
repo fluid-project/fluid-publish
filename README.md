@@ -1,4 +1,4 @@
-# publish #
+# fluid-publish #
 A command line tool and node module that can be used to simplify the process of publishing a module to NPM. This is particularly useful for creating development releases, e.g. nightly or continuous integration releases.
 
 By default this will create a release with version __X.x.x-prerelease.yyyymmddThhmmssZ.shortHash__ where __X.x.x__ is sourced from the version number in the package.json file, __-prerelease__ is from the `devTag` option (also applied as a tag to the release), and the __yyyymmddThhmmssZ.shortHash__ build identifier is generated based on the latest commit.
