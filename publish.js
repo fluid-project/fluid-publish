@@ -142,16 +142,18 @@ publish.setVersion = function (version, options) {
 /**
  * Calculates the current dev version of the package
  *
- * @param options {Object} - e.g. {"rawTimestampCmd": "git show -s --format=%ct HEAD", "revisionCmd": "git rev-parse --verify --short HEAD", "devVersion": "${version}.${timestamp}.${revision}"}
+ * @param options {Object} - e.g. {"rawTimestampCmd": "git show -s --format=%ct HEAD", "revisionCmd": "git rev-parse --verify --short HEAD", "devVersion": "${version}-${preRelease}.${timestamp}.${revision}", "devTag": "dev"}
  * @returns {String} - the current dev version number
  */
 publish.getDevVersion = function (options) {
     var rawTimestamp = publish.execSync(options.rawTimestampCmd || defaults.rawTimestampCmd);
     var timestamp = publish.convertToISO8601(rawTimestamp);
     var revision = publish.execSync(options.revisionCmd || defaults.revisionCmd);
+    var preRelease = options.devTag || defaults.devTag;
     var devVersionTemplate = options.devVersion || defaults.devVersion;
     var newStr = es6Template(devVersionTemplate, {
         version: pkg.version,
+        preRelease: preRelease,
         timestamp: timestamp,
         revision: revision
     });
@@ -225,8 +227,9 @@ publish.clean = function (options) {
  * Publishes a development build.
  * This creates a release named after the version, but with the build stamp
  * appended to the end. By default this will create a release with version
- * X.x.x-prerelease.yyyymmddThhmmssZ.shortHash where x.x.x-prerelease is sourced
- * from the version number in the package.json file and the build id
+ * X.x.x-prerelease.yyyymmddThhmmssZ.shortHash where X.x.x is sourced
+ * from the version number in the package.json file, -pre-release is from the
+ * devTag option (also applied as a tag to the release), and the build id
  * (yyyymmddThhmmssZ.shortHash) is generated based on the latest commit.
  *
  * @param isTest {Boolean} - indicates if this is a test run

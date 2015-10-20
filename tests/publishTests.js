@@ -149,8 +149,9 @@ console.log("\n*** publish.getDevVersion ***");
 var getDevVersionFixture = [{
     rawTimestampCmd: "get raw timestamp",
     revisionCmd: "get revision",
-    devVersion: "${timestamp}.${revision}",
-    expectedVersion: "20151015T131223Z.039d221",
+    devVersion: "${preRelease}.${timestamp}.${revision}",
+    devTag: "test",
+    expectedVersion: "test.20151015T131223Z.039d221",
     returnedTimestamp: 1444914743,
     returnedRevision: "039d221"
 }];
@@ -285,7 +286,7 @@ var publishFixture = [{
         "versionCmd": "dry run version",
         "distTagCmd": "dry run set tag",
         "cleanCmd": "dry run clean",
-        "devVersion": "dry run ${version}.${timestamp}.${revision}",
+        "devVersion": "dry run ${version}-${preRelease}.${timestamp}.${revision}",
         "devTag": "dry run dev"
     }
 }, {
@@ -299,7 +300,7 @@ var publishFixture = [{
         "versionCmd": "version",
         "distTagCmd": "set tag",
         "cleanCmd": "clean",
-        "devVersion": "${version}.${timestamp}.${revision}",
+        "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
         "devTag": "dev"
     }
 }];

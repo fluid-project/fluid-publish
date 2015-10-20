@@ -9,7 +9,7 @@ A command line tool and node module that can be used to simplify the process of 
 
 __value__: true (Boolean)
 
-Specifies that a development release should be generated. By default this will create a release with version X.x.x-prerelease.yyyymmddThhmmssZ.shortHash where x.x.x-prerelease is sourced from the version number in the package.json file and the build identifier (yyyymmddThhmmssZ.shortHash) is generated based on the latest commit.
+Specifies that a development release should be generated. By default this will create a release with version X.x.x-prerelease.yyyymmddThhmmssZ.shortHash where X.x.x is sourced from the version number in the package.json file, -prerelease is from the `devTag` option (also applied as a tag to the release), and the build identifier (yyyymmddThhmmssZ.shortHash) is generated based on the latest commit.
 
 ```bash
 # creates a dev release
@@ -66,7 +66,7 @@ publish.release();
 
 #### `dev` ####
 
-Publishes a development build. This creates a release named after the version, but with the build stamp appended to the end. By default this will create a release with version X.x.x-prerelease.yyyymmddThhmmssZ.shortHash where x.x.x-prerelease is sourced from the version number in the package.json file and the build identifier (yyyymmddThhmmssZ.shortHash) is generated based on the latest commit.
+Publishes a development build. This creates a release named after the version, but with the build stamp appended to the end. By default this will create a release with version X.x.x-prerelease.yyyymmddThhmmssZ.shortHash where X.x.x is sourced from the version number in the package.json file, -prerelease is from the `devTag` option (also applied as a tag to the release), and the build identifier (yyyymmddThhmmssZ.shortHash) is generated based on the latest commit.
 
 ```javascript
 var publish = require("publish");

@@ -1,6 +1,6 @@
 {
   "name": "publish",
-  "version": "0.1.0-dev",
+  "version": "0.1.0",
   "description": "A CLI tool for publishing a node package to npm",
   "main": "publish.js",
   "engines": {
@@ -46,7 +46,7 @@
     "versionCmd": "npm version --no-git-tag-version ${version}",
     "distTagCmd": "npm dist-tag add ${packageName}@${version} ${tag}",
     "cleanCmd": "git checkout -- package.json",
-    "devVersion": "${version}.${timestamp}.${revision}",
+    "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
     "devTag": "dev"
   }
 }
