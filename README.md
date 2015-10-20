@@ -3,22 +3,37 @@ A command line tool and node module that can be used to simplify the process of 
 
 By default this will create a release with version __X.x.x-prerelease.yyyymmddThhmmssZ.shortHash__ where __X.x.x__ is sourced from the version number in the package.json file, __-prerelease__ is from the `devTag` option (also applied as a tag to the release), and the __yyyymmddThhmmssZ.shortHash__ build identifier is generated based on the latest commit.
 
+## Installation ##
+
+```bash
+# global install
+npm install fluid-publish -g
+
+# local dev install
+npm install fluid-publish --save-dev
+```
+
 ## Usage ##
 
 ### Command Line ###
+
+```bash
+# creates a dev release (global install)
+fluid-publish
+
+# creates a dev release (local install)
+./node_modules/.bin/fluid-publish
+```
 
 #### --standard ####
 
 __value__: true (Boolean)
 
-Specifies that a standard release should be generated. This creates a release named after the version in the package.json file. It will not increase the version number, this must be done separately.
+Specifies that a standard release should be generated. This creates a release named after the version in the package.json file. It will not increase the version number.
 
 ```bash
-# creates a standard releases
-node publish.js --standard
-
-# creates a dev release
-node publish.js
+# creates a standard release
+fluid-publish --standard
 ```
 
 #### --test ####
@@ -29,12 +44,12 @@ Specifies that a tarball should be created instead of publishing to NPM. This is
 
 ```bash
 # creates a tarball
-node publish.js --test
-node publish.js --test --standard
+fluid-publish --test
+fluid-publish --test --standard
 
 # publishes to NPM
-node publish.js
-node publish.js --standard
+fluid-publish
+fluid-publish --standard
 ```
 
 #### --options #####
@@ -47,7 +62,7 @@ A stringified JSON object containing overrides to the default options used acros
 
 ```bash
 # publishes a dev build and applies the tag "nightly" to it
-node publish.js --options="{'devTag': 'nightly'}"
+fluid-publish --options="{'devTag': 'nightly'}"
 ```
 
 ### Node ###
@@ -62,7 +77,7 @@ node publish.js --options="{'devTag': 'nightly'}"
 Publishes a development build. This creates a release named after the version, but with the build stamp appended to the end. By default this will create a release with version X.x.x-prerelease.yyyymmddThhmmssZ.shortHash where X.x.x is sourced from the version number in the package.json file, -prerelease is from the `devTag` option (also applied as a tag to the release), and the build identifier (yyyymmddThhmmssZ.shortHash) is generated based on the latest commit.
 
 ```javascript
-var publish = require("publish");
+var publish = require("fluid-publish");
 publish.dev();
 ```
 
@@ -76,7 +91,7 @@ publish.dev();
 Publishes a release build. This creates a release named after the version in the package.json file. By default it will not increase the version number, this must be done separately.
 
 ```javascript
-var publish = require("publish");
+var publish = require("fluid-publish");
 publish.standard();
 ```
 

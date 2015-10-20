@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 /*
 Copyright 2015 OCAD University
 
@@ -11,12 +13,15 @@ https://github.com/fluid-project/first-discovery-server/raw/master/LICENSE.txt
 "use strict";
 
 var publish = {};
-var pkg = require("./package.json");
+var path = require("path");
+var pkgPath = path.join(__dirname, "package.json");
+var pkg = require(pkgPath);
 var extend = require("extend");
 
 // The package.json file of the top level package which is
 // running this module.
-var modulePkg = require(process.cwd() + "/package.json");
+var modulePkgPath = path.join(process.cwd(), "package.json");
+var modulePkg = require(modulePkgPath);
 
 // execSync  and log are added to the exported "publish" namespace so they can
 // be stubbed in the tests.

@@ -10,6 +10,7 @@
     "pub": "node publish.js",
     "test": "node tests/publishTests.js"
   },
+  "bin": "./publish.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jobara/publish.git"
