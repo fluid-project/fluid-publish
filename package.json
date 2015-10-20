@@ -1,6 +1,6 @@
 {
   "name": "publish",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A CLI tool for publishing a node package to npm",
   "main": "publish.js",
   "engines": {
