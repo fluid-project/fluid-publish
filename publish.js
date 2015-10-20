@@ -18,11 +18,6 @@ var pkgPath = path.join(__dirname, "package.json");
 var pkg = require(pkgPath);
 var extend = require("extend");
 
-// The package.json file of the top level package which is
-// running this module.
-var modulePkgPath = path.join(process.cwd(), "package.json");
-var modulePkg = require(modulePkgPath);
-
 // execSync  and log are added to the exported "publish" namespace so they can
 // be stubbed in the tests.
 publish.execSync = require("child_process").execSync;
@@ -147,32 +142,23 @@ publish.setVersion = function (version, options) {
 /**
  * Calculates the current dev version of the package
  *
+ * @param moduleVersion {String} - The version of the module (e.g. X.x.x)
  * @param options {Object} - e.g. {"rawTimestampCmd": "git show -s --format=%ct HEAD", "revisionCmd": "git rev-parse --verify --short HEAD", "devVersion": "${version}-${preRelease}.${timestamp}.${revision}", "devTag": "dev"}
  * @returns {String} - the current dev version number
  */
-publish.getDevVersion = function (options) {
+publish.getDevVersion = function (moduleVersion, options) {
     var rawTimestamp = publish.execSync(options.rawTimestampCmd || defaults.rawTimestampCmd);
     var timestamp = publish.convertToISO8601(rawTimestamp);
     var revision = publish.execSync(options.revisionCmd || defaults.revisionCmd);
     var preRelease = options.devTag || defaults.devTag;
     var devVersionTemplate = options.devVersion || defaults.devVersion;
     var newStr = es6Template(devVersionTemplate, {
-        version: pkg.version,
+        version: moduleVersion,
         preRelease: preRelease,
         timestamp: timestamp,
         revision: revision
     });
     return newStr;
-};
-
-/**
- * Retrieves the name of the executing module.
- *
- * @returns {String} - the name of the executing module, as sourced from its
- *                     package.json file.
- */
-publish.getPackageName = function () {
-    return modulePkg.name;
 };
 
 /**
@@ -221,9 +207,10 @@ publish.tag = function (isTest, packageName, version, tag, options) {
  * Restore the package.json file to the latest committed version.
  *
  * Used internally to reset version number changes in package.json
- * @param options {Object} - e.g. {"cleanCmd": "git reset HEAD --hard"}
+ * @param packagePath {String} - the path to the package.json file to clean
+ * @param options {Object} - e.g. {"cleanCmd": "git checkout -- ${package}"}
  */
-publish.clean = function (options) {
+publish.clean = function (packagePath, options) {
     var cmdStr = options.cleanCmd || defaults.cleanCmd;
     publish.execSync(cmdStr);
 };
@@ -243,20 +230,24 @@ publish.clean = function (options) {
 publish.dev = function (isTest, options) {
     var opts = extend(true, {}, defaults, options);
 
+    // The package.json file of the top level package which is
+    // running this module.
+    var modulePkgPath = path.join(opts.moduleRoot || process.cwd(), "package.json");
+    var modulePkg = require(modulePkgPath);
+
     // Ensure no uncommitted changes
     publish.checkChanges(opts);
 
-    var devVersion = publish.getDevVersion(opts);
-    var packageName = publish.getPackageName();
+    var devVersion = publish.getDevVersion(modulePkg.version, opts);
 
     // set the version number
     publish.setVersion(devVersion, opts);
 
     publish.pubImpl(isTest, opts);
-    publish.tag(isTest, packageName, devVersion, opts.devTag, opts);
+    publish.tag(isTest, modulePkg.name, devVersion, opts.devTag, opts);
 
     // cleanup changes
-    publish.clean(opts);
+    publish.clean(modulePkgPath, opts);
 };
 
 /**

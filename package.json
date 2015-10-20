@@ -46,8 +46,9 @@
     "publishCmd": "npm publish",
     "versionCmd": "npm version --no-git-tag-version ${version}",
     "distTagCmd": "npm dist-tag add ${packageName}@${version} ${tag}",
-    "cleanCmd": "git checkout -- package.json",
+    "cleanCmd": "git checkout -- ${package}",
     "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
-    "devTag": "dev"
+    "devTag": "dev",
+    "moduleRoot": ""
   }
 }

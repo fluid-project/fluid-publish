@@ -10,6 +10,7 @@ https://github.com/fluid-project/first-discovery-server/raw/master/LICENSE.txt
 
 "use strict";
 
+var path = require("path");
 var publish = require("../publish.js");
 var assert = require("assert");
 var sinon = require("sinon");
@@ -149,9 +150,10 @@ console.log("\n*** publish.getDevVersion ***");
 var getDevVersionFixture = [{
     rawTimestampCmd: "get raw timestamp",
     revisionCmd: "get revision",
-    devVersion: "${preRelease}.${timestamp}.${revision}",
+    devVersion: "${version}-${preRelease}.${timestamp}.${revision}",
     devTag: "test",
-    expectedVersion: "test.20151015T131223Z.039d221",
+    moduleVersion: "1.2.3",
+    expectedVersion: "1.2.3-test.20151015T131223Z.039d221",
     returnedTimestamp: 1444914743,
     returnedRevision: "039d221"
 }];
@@ -163,7 +165,7 @@ getDevVersionFixture.forEach(function (fixture) {
     exec.onFirstCall().returns(fixture.returnedTimestamp);
     exec.onSecondCall().returns(fixture.returnedRevision);
 
-    var result = publish.getDevVersion(fixture);
+    var result = publish.getDevVersion(fixture.moduleVersion, fixture);
 
     assert(exec.calledTwice, "execSync should have been called twice");
     assert(exec.calledWith(fixture.rawTimestampCmd), "first execSync should have been called with: " + fixture.rawTimestampCmd);
@@ -256,6 +258,7 @@ tagFixture.forEach(function (fixture) {
 console.log("\n*** publish.clean ***");
 
 var cleanFixture = [{
+    packagePath: "path/to/package.json",
     cleanCmd: "clean command"
 }];
 
@@ -264,7 +267,7 @@ cleanFixture.forEach(function (fixture) {
 
     var exec = sinon.stub(publish, "execSync");
 
-    publish.clean(fixture);
+    publish.clean(fixture.packagePath, fixture);
 
     assert(exec.calledOnce, "execSync should have been called");
     assert(exec.calledWith(fixture.cleanCmd), "execSync should have been called with: " + fixture.cleanCmd);
@@ -287,7 +290,8 @@ var publishFixture = [{
         "distTagCmd": "dry run set tag",
         "cleanCmd": "dry run clean",
         "devVersion": "dry run ${version}-${preRelease}.${timestamp}.${revision}",
-        "devTag": "dry run dev"
+        "devTag": "dry run dev",
+        "moduleRoot": __dirname
     }
 }, {
     isTest: false,
@@ -301,7 +305,8 @@ var publishFixture = [{
         "distTagCmd": "set tag",
         "cleanCmd": "clean",
         "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
-        "devTag": "dev"
+        "devTag": "dev",
+        "moduleRoot": __dirname
     }
 }];
 
@@ -309,30 +314,31 @@ var publishFixture = [{
 console.log("\n*** publish.dev ***");
 
 publishFixture.forEach(function (fixture) {
+    var modulePackagePath = path.join(fixture.options.moduleRoot, "package.json");
+    var modulePackage = require(modulePackagePath);
     var optsString = JSON.stringify(fixture.options || {});
     console.log("dev test - isTest: " + fixture.isTest, " options: " + optsString + "\n");
 
-    var toStub = ["checkChanges", "getPackageName", "getDevVersion", "setVersion", "pubImpl", "tag", "clean"];
+    var toStub = ["checkChanges", "getDevVersion", "setVersion", "pubImpl", "tag", "clean"];
     var stub = createStubs(publish, toStub);
-    var devVersion = "1.0.0-testVersion";
-    var packageName = "testPkg";
+    var moduleVersion = modulePackage.version;
+    var devVersion = moduleVersion + "-testVersion";
 
     stub.getDevVersion.returns(devVersion);
-    stub.getPackageName.returns(packageName);
 
     publish.dev(fixture.isTest, fixture.options);
 
     assert(stub.checkChanges.calledOnce, "checkChanges should have been called");
     assert(stub.getDevVersion.calledOnce, "getDevVersion should have been called");
-    assert(stub.getDevVersion.calledWith(fixture.options), "getDevVersion should have been called with: " + optsString);
+    assert(stub.getDevVersion.calledWith(moduleVersion, fixture.options), "getDevVersion should have been called with:" + moduleVersion + ", " + optsString);
     assert(stub.setVersion.calledOnce, "setVersion should have been called");
     assert(stub.setVersion.calledWith(devVersion, fixture.options), "setVersion should have been called with: " + devVersion + ", " + optsString);
     assert(stub.pubImpl.calledOnce, "pubImpl should have been called");
     assert(stub.pubImpl.calledWith(fixture.isTest, fixture.options), "pubImpl should have been called with: " + fixture.isTest + ", " + optsString);
     assert(stub.tag.calledOnce, "tag should have been called");
-    assert(stub.tag.calledWith(fixture.isTest, packageName, devVersion, fixture.options.devTag, fixture.options), "tag should have been called with: " + fixture.isTest + ", " + packageName + ", " + devVersion + ", " + fixture.options.devTag + ", " + optsString);
+    assert(stub.tag.calledWith(fixture.isTest, modulePackage.name, devVersion, fixture.options.devTag, fixture.options), "tag should have been called with: " + fixture.isTest + ", " + modulePackage.name + ", " + devVersion + ", " + fixture.options.devTag + ", " + optsString);
     assert(stub.clean.calledOnce, "clean should have been called");
-    assert(stub.clean.calledWith(fixture.options), "clean should have been called with: " + optsString);
+    assert(stub.clean.calledWith(modulePackagePath, fixture.options), "clean should have been called with: " + modulePackagePath + ", " + optsString);
 
     removeStubs(publish, toStub);
 });

@@ -174,12 +174,20 @@ publish.standard();
             <td>
                 The CLI to execute which sets the dev version to release under.
 
-                `${version}` will be substituted with the generated dev build version.
+                <dl>
+                    <dt>`${version}`</dt>
+                    <dd>
+                        will be substituted with the generated dev build version.
+                    <dd>
+                </dl>
             </td>
             <td>
                 "npm version --no-git-tag-version ${version}"
-
-                <em><strong>NOTE</strong>: This command will update the version in the package.json file, but will not commit the change.</em>
+                <br>
+                <br>
+                <p>
+                    <em><strong>NOTE</strong>: This command will update the version in the package.json file, but will not commit the change.</em>
+                </p>
             </td>
         </tr>
         <tr>
@@ -189,16 +197,30 @@ publish.standard();
             <td>
                 The CLI to execute which tags an NPM release.
 
-                `${packageName}` will be substituted with executing module's name.
+                <dl>
+                    <dt>`${packageName}`</dt>
+                    <dd>
+                        will be substituted with executing module's name.
+                    </dd>
 
-                `${version}` will be substituted with the generated dev build version.
+                    <dt>`${version}`</dt>
+                    <dd>
+                        will be substituted with the generated dev build version.
+                    </dd>
 
-                `${tag}` will be substituted with the value from the `devTag` option.
+                    <dt>`${tag}`</dt>
+                    <dd>
+                        will be substituted with the value from the `devTag` option.
+                    </dd>
+                </dl>
             </td>
             <td>
                 "npm dist-tag add ${packageName}@${version} ${tag}"
-
-                <em><strong>NOTE</strong>: This command will update the version in the package.json file, but will not commit the change.</em>
+                <br>
+                <br>
+                <p>
+                    <em><strong>NOTE</strong>: This command will update the version in the package.json file, but will not commit the change.</em>
+                </p>
             </td>
         </tr>
         <tr>
@@ -207,9 +229,16 @@ publish.standard();
             </td>
             <td>
                 The CLI to execute which cleans up any temporary changes to the package.json file.
+
+                <dl>
+                    <dt>`${package}`</dt>
+                    <dd>
+                        will be substituted with the path to the executing modules package.json file.
+                    </dd>
+                </dl>
             </td>
             <td>
-                "git checkout -- package.json"
+                "git checkout -- ${package}"
             </td>
         </tr>
         <tr>
@@ -219,11 +248,22 @@ publish.standard();
             <td>
                 The string template for constructing a dev release version number.
 
-                `${version}` will be substituted with the version in the package.json file.
+                <dl>
+                    <dt>`${version}`</dt>
+                    <dd>
+                        will be substituted with the version in the package.json file.
+                    </dd>
 
-                `${timestamp}` will be substituted with the generated ISO8601 timestamp based on the most recent commit.
+                    <dt>`${timestamp}`</dt>
+                    <dd>
+                        will be substituted with the generated ISO8601 timestamp based on the most recent commit.
+                    </dd>
 
-                `${revision}` will be substituted with the revision/hash of the most recent commit.
+                    <dt>`${revision}`</dt>
+                    <dd>
+                        will be substituted with the revision/hash of the most recent commit.
+                    </dd>
+                </dl>    
             </td>
             <td>
                 "${version}.${timestamp}.${revision}"
@@ -238,6 +278,22 @@ publish.standard();
             </td>
             <td>
                 "dev"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                `moduleRoot`
+            </td>
+            <td>
+                The root directory of the module executing `fluid-publish`
+            </td>
+            <td>
+                ""
+                <br>
+                <br>
+                <p>
+                    <em><strong>NOTE</strong>: This refers to the current working directory and is analogous to    `process.cwd`</em>
+                </p>
             </td>
         </tr>
     </tbody>
