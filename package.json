@@ -1,5 +1,5 @@
 {
-  "name": "publish",
+  "name": "fluid-publish",
   "version": "1.0.0",
   "description": "A CLI tool for publishing a node package to npm",
   "main": "publish.js",
