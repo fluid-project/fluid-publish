@@ -1,0 +1,54 @@
+{
+  "name": "fluid-publish",
+  "version": "1.0.0",
+  "description": "A CLI tool for publishing a node package to npm",
+  "main": "publish.js",
+  "engines": {
+    "node": ">=0.12.0"
+  },
+  "scripts": {
+    "pub": "node publish.js",
+    "test": "node tests/publishTests.js"
+  },
+  "bin": "./publish.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jobara/publish.git"
+  },
+  "keywords": [
+    "npm",
+    "publish",
+    "node",
+    "module",
+    "CLI"
+  ],
+  "author": "Fluid Project",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/jobara/publish/issues"
+  },
+  "homepage": "http://fluidproject.org",
+  "dependencies": {
+    "es6-template-strings": "2.0.0",
+    "extend": "^3.0.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "~0.9.0",
+    "grunt-jsonlint": "1.0.4",
+    "sinon": "^1.17.1"
+  },
+  "defaultOptions": {
+    "changesCmd": "git status -s -uno",
+    "rawTimestampCmd": "git show -s --format=%ct HEAD",
+    "revisionCmd": "git rev-parse --verify --short HEAD",
+    "packCmd": "npm pack",
+    "publishCmd": "npm publish",
+    "versionCmd": "npm version --no-git-tag-version ${version}",
+    "distTagCmd": "npm dist-tag add ${packageName}@${version} ${tag}",
+    "cleanCmd": "git checkout -- package.json",
+    "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
+    "devTag": "dev",
+    "moduleRoot": ""
+  }
+}
