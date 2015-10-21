@@ -207,15 +207,22 @@ publish.tag = function (isTest, packageName, version, tag, options) {
  * Restore the package.json file to the latest committed version.
  *
  * Used internally to reset version number changes in package.json
- * @param packagePath {String} - the path to the package.json file to clean
- * @param options {Object} - e.g. {"cleanCmd": "git checkout -- ${package}"}
+ * @param moduleRoot {String} - the directory where the package.json file to
+                                clean is located in.
+ * @param options {Object} - e.g. {"cleanCmd": "git checkout -- package.json"}
  */
-publish.clean = function (packagePath, options) {
-    var cmdTemplate = options.cleanCmd || defaults.cleanCmd;
-    var cmdStr = es6Template(cmdTemplate, {
-        "package": packagePath
-    });
+publish.clean = function (moduleRoot, options) {
+    var cmdStr = options.cleanCmd || defaults.cleanCmd;
+    var originalDir = process.cwd();
+
+    // change to the module root directory
+    process.chdir(moduleRoot || "./");
+
+    // run the clean command
     publish.execSync(cmdStr);
+
+    // restore the working directory
+    process.chdir(originalDir);
 };
 
 /**
@@ -250,7 +257,7 @@ publish.dev = function (isTest, options) {
     publish.tag(isTest, modulePkg.name, devVersion, opts.devTag, opts);
 
     // cleanup changes
-    publish.clean(modulePkgPath, opts);
+    publish.clean(opts.moduleRoot, opts);
 };
 
 /**

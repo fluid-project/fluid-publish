@@ -258,9 +258,8 @@ tagFixture.forEach(function (fixture) {
 console.log("\n*** publish.clean ***");
 
 var cleanFixture = [{
-    packagePath: "path/to/package.json",
-    cleanCmd: "clean ${package}",
-    expected: "clean path/to/package.json"
+    moduleRoot: "./",
+    cleanCmd: "clean"
 }];
 
 cleanFixture.forEach(function (fixture) {
@@ -268,10 +267,10 @@ cleanFixture.forEach(function (fixture) {
 
     var exec = sinon.stub(publish, "execSync");
 
-    publish.clean(fixture.packagePath, fixture);
+    publish.clean(fixture.moduleRoot, fixture);
 
     assert(exec.calledOnce, "execSync should have been called");
-    assert(exec.calledWith(fixture.expected), "execSync should have been called with: " + fixture.expected);
+    assert(exec.calledWith(fixture.cleanCmd), "execSync should have been called with: " + fixture.expected);
 
     // remove execSync stub
     publish.execSync.restore();
@@ -339,7 +338,7 @@ publishFixture.forEach(function (fixture) {
     assert(stub.tag.calledOnce, "tag should have been called");
     assert(stub.tag.calledWith(fixture.isTest, modulePackage.name, devVersion, fixture.options.devTag, fixture.options), "tag should have been called with: " + fixture.isTest + ", " + modulePackage.name + ", " + devVersion + ", " + fixture.options.devTag + ", " + optsString);
     assert(stub.clean.calledOnce, "clean should have been called");
-    assert(stub.clean.calledWith(modulePackagePath, fixture.options), "clean should have been called with: " + modulePackagePath + ", " + optsString);
+    assert(stub.clean.calledWith(fixture.options.moduleRoot, fixture.options), "clean should have been called with: " + fixture.options.moduleRoot + ", " + optsString);
 
     removeStubs(publish, toStub);
 });

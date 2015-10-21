@@ -17,6 +17,8 @@ npm install fluid-publish --save-dev
 
 ### Command Line ###
 
+Run these commands from the root directory of the module to be published.
+
 ```bash
 # creates a dev release (global install)
 fluid-publish
@@ -278,22 +280,6 @@ publish.standard();
             </td>
             <td>
                 "dev"
-            </td>
-        </tr>
-        <tr>
-            <td>
-                `moduleRoot`
-            </td>
-            <td>
-                The root directory of the module executing `fluid-publish`
-            </td>
-            <td>
-                ""
-                <br>
-                <br>
-                <p>
-                    <em><strong>NOTE</strong>: This refers to the current working directory and is analogous to    `process.cwd`</em>
-                </p>
             </td>
         </tr>
     </tbody>
