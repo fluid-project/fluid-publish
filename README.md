@@ -116,7 +116,7 @@ publish.standard();
     <tbody>
         <tr>
             <td>
-                `changesCmd`
+                <code>changesCmd</code>
             </td>
             <td>
                 The CLI to execute which determines if there are any uncommitted changes. It should return a string of changes, or nothing.
@@ -127,7 +127,7 @@ publish.standard();
         </tr>
         <tr>
             <td>
-                `rawTimestampCmd`
+                <code>rawTimestampCmd</code>
             </td>
             <td>
                 The CLI to execute which returns a git format timestamp for the most recent commit.
@@ -138,7 +138,7 @@ publish.standard();
         </tr>
         <tr>
             <td>
-                `revisionCmd`
+                <code>revisionCmd</code>
             </td>
             <td>
                 The CLI to execute which returns the most recent commit revision number/hash.
@@ -149,7 +149,7 @@ publish.standard();
         </tr>
         <tr>
             <td>
-                `packCmd`
+                <code>packCmd</code>
             </td>
             <td>
                 The CLI to execute which constructs a tarball of the release artifact.
@@ -160,7 +160,7 @@ publish.standard();
         </tr>
         <tr>
             <td>
-                `publishCmd`
+                <code>publishCmd</code>
             </td>
             <td>
                 The CLI to execute which publishes a release to NPM.
@@ -171,17 +171,15 @@ publish.standard();
         </tr>
         <tr>
             <td>
-                `versionCmd`
+                <code>versionCmd</code>
             </td>
             <td>
                 The CLI to execute which sets the dev version to release under.
-
-                <dl>
-                    <dt>`${version}`</dt>
-                    <dd>
-                        will be substituted with the generated dev build version.
-                    <dd>
-                </dl>
+                <ul>
+                    <li>
+                        <code>${version}</code> will be substituted with the generated dev build version.
+                    </li>
+                </ul>
             </td>
             <td>
                 "npm version --no-git-tag-version ${version}"
@@ -194,27 +192,21 @@ publish.standard();
         </tr>
         <tr>
             <td>
-                `distTagCmd`
+                <code>distTagCmd</code>
             </td>
             <td>
                 The CLI to execute which tags an NPM release.
-
-                <dl>
-                    <dt>`${packageName}`</dt>
-                    <dd>
-                        will be substituted with executing module's name.
-                    </dd>
-
-                    <dt>`${version}`</dt>
-                    <dd>
-                        will be substituted with the generated dev build version.
-                    </dd>
-
-                    <dt>`${tag}`</dt>
-                    <dd>
-                        will be substituted with the value from the `devTag` option.
-                    </dd>
-                </dl>
+                <ul>
+                    <li>
+                        <code>${packageName}</code> will be substituted with executing module's name.
+                    </li>
+                    <li>
+                        <code>${version}</code> will be substituted with the generated dev build version.
+                    </li>
+                    <li>
+                        <code>${tag}</code>will be substituted with the value from the <code>devTag</code> option.
+                    </li>
+                </ul>
             </td>
             <td>
                 "npm dist-tag add ${packageName}@${version} ${tag}"
@@ -227,17 +219,15 @@ publish.standard();
         </tr>
         <tr>
             <td>
-                `cleanCmd`
+                <code>cleanCmd</code>
             </td>
             <td>
                 The CLI to execute which cleans up any temporary changes to the package.json file.
-
-                <dl>
-                    <dt>`${package}`</dt>
-                    <dd>
-                        will be substituted with the path to the executing modules package.json file.
-                    </dd>
-                </dl>
+                <ul>
+                    <li>
+                        <code>${package}</code> will be substituted with the path to the executing modules package.json file.
+                    </li>
+                </ul>
             </td>
             <td>
                 "git checkout -- ${package}"
@@ -245,27 +235,21 @@ publish.standard();
         </tr>
         <tr>
             <td>
-                `devVersion`
+                <code>devVersion</code>
             </td>
             <td>
                 The string template for constructing a dev release version number.
-
-                <dl>
-                    <dt>`${version}`</dt>
-                    <dd>
-                        will be substituted with the version in the package.json file.
-                    </dd>
-
-                    <dt>`${timestamp}`</dt>
-                    <dd>
-                        will be substituted with the generated ISO8601 timestamp based on the most recent commit.
-                    </dd>
-
-                    <dt>`${revision}`</dt>
-                    <dd>
-                        will be substituted with the revision/hash of the most recent commit.
-                    </dd>
-                </dl>    
+                <ul>
+                    <li>
+                        <code>${version}</code> will be substituted with the version in the package.json file.
+                    </li>
+                    <li>
+                        <code>${timestamp}</code> will be substituted with the generated ISO8601 timestamp based on the most recent commit.
+                    </li>
+                    <li>
+                        <code>${revision}</code> will be substituted with the revision/hash of the most recent commit.
+                    </li>
+                </ul>    
             </td>
             <td>
                 "${version}.${timestamp}.${revision}"
@@ -273,7 +257,7 @@ publish.standard();
         </tr>
         <tr>
             <td>
-                `devTag`
+                <code>devTag</code>
             </td>
             <td>
                 The tag name to use for tagging dev releases.
