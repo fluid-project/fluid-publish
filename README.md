@@ -175,12 +175,11 @@ publish.standard();
             </td>
             <td>
                 The CLI to execute which sets the dev version to release under.
-                <dl>
-                    <dt><code>${version}</code></dt>
-                    <dd>
-                        will be substituted with the generated dev build version.
-                    </dd>
-                </dl>
+                <ul>
+                    <li>
+                        <code>${version}</code> will be substituted with the generated dev build version.
+                    </li>
+                </ul>
             </td>
             <td>
                 "npm version --no-git-tag-version ${version}"
@@ -197,22 +196,17 @@ publish.standard();
             </td>
             <td>
                 The CLI to execute which tags an NPM release.
-                <dl>
-                    <dt><code>${packageName}</code></dt>
-                    <dd>
-                        will be substituted with executing module's name.
-                    </dd>
-
-                    <dt><code>${version}</code></dt>
-                    <dd>
-                        will be substituted with the generated dev build version.
-                    </dd>
-
-                    <dt><code>${tag}</code></dt>
-                    <dd>
-                        will be substituted with the value from the <code>devTag</code> option.
-                    </dd>
-                </dl>
+                <ul>
+                    <li>
+                        <code>${packageName}</code> will be substituted with executing module's name.
+                    </li>
+                    <li>
+                        <code>${version}</code> will be substituted with the generated dev build version.
+                    </li>
+                    <li>
+                        <code>${tag}</code>will be substituted with the value from the <code>devTag</code> option.
+                    </li>
+                </ul>
             </td>
             <td>
                 "npm dist-tag add ${packageName}@${version} ${tag}"
@@ -229,12 +223,11 @@ publish.standard();
             </td>
             <td>
                 The CLI to execute which cleans up any temporary changes to the package.json file.
-                <dl>
-                    <dt><code>${package}</code></dt>
-                    <dd>
-                        will be substituted with the path to the executing modules package.json file.
-                    </dd>
-                </dl>
+                <ul>
+                    <li>
+                        <code>${package}</code> will be substituted with the path to the executing modules package.json file.
+                    </li>
+                </ul>
             </td>
             <td>
                 "git checkout -- ${package}"
@@ -246,22 +239,17 @@ publish.standard();
             </td>
             <td>
                 The string template for constructing a dev release version number.
-                <dl>
-                    <dt><code>${version}</code></dt>
-                    <dd>
-                        will be substituted with the version in the package.json file.
-                    </dd>
-
-                    <dt><code>${timestamp}</code></dt>
-                    <dd>
-                        will be substituted with the generated ISO8601 timestamp based on the most recent commit.
-                    </dd>
-
-                    <dt><code>${revision}</code></dt>
-                    <dd>
-                        will be substituted with the revision/hash of the most recent commit.
-                    </dd>
-                </dl>    
+                <ul>
+                    <li>
+                        <code>${version}</code> will be substituted with the version in the package.json file.
+                    </li>
+                    <li>
+                        <code>${timestamp}</code> will be substituted with the generated ISO8601 timestamp based on the most recent commit.
+                    </li>
+                    <li>
+                        <code>${revision}</code> will be substituted with the revision/hash of the most recent commit.
+                    </li>
+                </ul>    
             </td>
             <td>
                 "${version}.${timestamp}.${revision}"
