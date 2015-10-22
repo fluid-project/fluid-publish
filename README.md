@@ -31,7 +31,7 @@ fluid-publish
 
 __value__: true (Boolean)
 
-Specifies that a standard release should be generated. This creates a release named after the version in the package.json file. It will not increase the version number.
+Specifies that a standard release should be generated. This creates a release named after the version in the package.json file. It will not increase the version number. However, it will create a tag and publish this tag to the version control system.
 
 ```bash
 # creates a standard release
@@ -90,7 +90,7 @@ publish.dev();
 
 #### `standard` ####
 
-Publishes a release build. This creates a release named after the version in the package.json file. By default it will not increase the version number, this must be done separately.
+Publishes a release build. This creates a release named after the version in the package.json file. By default it will not increase the version number, this must be done separately. However, it will create a tag and publish this tag to the version control system.
 
 ```javascript
 var publish = require("fluid-publish");
@@ -231,6 +231,38 @@ publish.standard();
             </td>
             <td>
                 "git checkout -- ${package}"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>vcTagCmd</code>
+            </td>
+            <td>
+                The CLI to execute which creates the version control tag.
+                <ul>
+                    <li>
+                        <code>${version}</code> will be substituted with the version from the package.json file.
+                    </li>
+                </ul>
+            </td>
+            <td>
+                "git tag -a v${version} -m 'Tagging the ${version} release'"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>pushVCTagCmd</code>
+            </td>
+            <td>
+                The CLI to execute which publishes the version control tag.
+                <ul>
+                    <li>
+                        <code>${version}</code> will be substituted with the version from the package.json file.
+                    </li>
+                </ul>
+            </td>
+            <td>
+                "git push upstream v${version}"
             </td>
         </tr>
         <tr>

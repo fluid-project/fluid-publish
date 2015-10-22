@@ -29,6 +29,25 @@ var removeStubs = function (obj, methods) {
     });
 };
 
+// publish.getPkg
+console.log("\n*** publish.getPkg ***");
+
+var getPkgFixture = [{
+    moduleRoot: __dirname,
+    expected: {
+        name: "fluid-publish-test",
+        version: "0.0.0"
+    }
+}];
+
+getPkgFixture.forEach(function (fixture) {
+    console.log("getPkg test - moduleRoot: " + fixture.moduleRoot);
+
+    var result = publish.getPkg(fixture.moduleRoot);
+
+    assert.deepEqual(result, fixture.expected, "Expected pkg: " + JSON.stringify(fixture.expected) + " actual: " + JSON.stringify(result));
+});
+
 // publish.padZeros
 console.log("\n*** publish.padZeros ***");
 
@@ -120,6 +139,72 @@ checkChangesFixture.forEach(function (fixture) {
 
     // remove execSync stub
     publish.execSync.restore();
+});
+
+// publish.execSyncFromTemplate
+console.log("\n*** publish.execSyncFromTemplate ***");
+
+var execSyncFromTemplateFixture = [{
+    template: "${value1}",
+    values: {
+        value1: "value one"
+    },
+    expected: "value one",
+    expectedLog: "command: value one"
+}, {
+    template: "${value1} and ${value2}",
+    values: {
+        value1: "value one",
+        value2: "value two"
+    },
+    expected: "value one and value two",
+    expectedLog: "command: value one and value two"
+}, {
+    template: "${value1} to ${value2} and back to ${value1}",
+    values: {
+        value1: "value one",
+        value2: "value two"
+    },
+    expected: "value one to value two and back to value one",
+    expectedLog: "command: value one to value two and back to value one"
+}, {
+    template: "no value",
+    values: {
+        value1: "value one",
+        value2: "value two"
+    },
+    expected: "no value",
+    expectedLog: "command: no value"
+}, {
+    template: "$ {noToken}",
+    values: {
+        noToken: "no token"
+    },
+    expected: "$ {noToken}",
+    expectedLog: "command: $ {noToken}"
+}];
+
+execSyncFromTemplateFixture.forEach(function (fixture) {
+    var toStub = ["execSync", "log"];
+    var stub = createStubs(publish, toStub);
+
+
+    console.log("execSyncFromTemplate test - template: " + fixture.template + " values: " + JSON.stringify(fixture.values) + " isTest: " + false);
+
+    publish.execSyncFromTemplate(fixture.template, fixture.values);
+    assert(stub.execSync.called, "execSync should have been called");
+    assert(stub.execSync.calledWith(fixture.expected), "execSync should have been called with: " + fixture.expected);
+    assert(!stub.log.called, "log should not have been called");
+
+    console.log("execSyncFromTemplate test - template: " + fixture.template + " values: " + JSON.stringify(fixture.values) + " isTest: " + true);
+
+    publish.execSyncFromTemplate(fixture.template, fixture.values, true);
+    assert(stub.log.called, "log should have been called");
+    assert(stub.log.calledWith(fixture.expectedLog), "log should have been called with: " + fixture.expectedLog);
+    // using calledOnce because exec should have been called in the previous execSyncFromTemplate call.
+    assert(stub.execSync.calledOnce, "execSync should not have been called");
+
+    removeStubs(publish, toStub);
 });
 
 // publish.setVersion
@@ -215,7 +300,7 @@ var tagFixture = [{
     version: "1.0.0",
     tag: "tag",
     distTagCmd: "add tag ${tag} to ${packageName} at ${version}",
-    expected: "tag command: add tag tag to test1 at 1.0.0"
+    expected: "command: add tag tag to test1 at 1.0.0"
 }, {
     isTest: false,
     packageName: "test2",
@@ -289,6 +374,8 @@ var publishFixture = [{
         "versionCmd": "dry run version",
         "distTagCmd": "dry run set tag",
         "cleanCmd": "dry run clean",
+        "vcTagCmd": "dry run vc tag",
+        "pushVCTagCmd": "dry run push vc tag",
         "devVersion": "dry run ${version}-${preRelease}.${timestamp}.${revision}",
         "devTag": "dry run dev",
         "moduleRoot": __dirname
@@ -304,6 +391,8 @@ var publishFixture = [{
         "versionCmd": "version",
         "distTagCmd": "set tag",
         "cleanCmd": "clean",
+        "vcTagCmd": "dry run vc tag",
+        "pushVCTagCmd": "dry run push vc tag",
         "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
         "devTag": "dev",
         "moduleRoot": __dirname
@@ -334,7 +423,7 @@ publishFixture.forEach(function (fixture) {
     assert(stub.setVersion.calledOnce, "setVersion should have been called");
     assert(stub.setVersion.calledWith(devVersion, fixture.options), "setVersion should have been called with: " + devVersion + ", " + optsString);
     assert(stub.pubImpl.calledOnce, "pubImpl should have been called");
-    assert(stub.pubImpl.calledWith(fixture.isTest, fixture.options), "pubImpl should have been called with: " + fixture.isTest + ", " + optsString);
+    assert(stub.pubImpl.calledWith(fixture.isTest, fixture.options), modulePackage);
     assert(stub.tag.calledOnce, "tag should have been called");
     assert(stub.tag.calledWith(fixture.isTest, modulePackage.name, devVersion, fixture.options.devTag, fixture.options), "tag should have been called with: " + fixture.isTest + ", " + modulePackage.name + ", " + devVersion + ", " + fixture.options.devTag + ", " + optsString);
     assert(stub.clean.calledOnce, "clean should have been called");
@@ -347,15 +436,19 @@ publishFixture.forEach(function (fixture) {
 console.log("\n*** publish.standard ***");
 
 publishFixture.forEach(function (fixture) {
+    var modulePackagePath = path.join(fixture.options.moduleRoot, "package.json");
+    var modulePackage = require(modulePackagePath);
     var optsString = JSON.stringify(fixture.options || {});
     console.log("release test - isTest: " + fixture.isTest, " options: " + optsString + "\n");
 
-    var toStub = ["checkChanges", "pubImpl"];
+    var toStub = ["checkChanges", "tagVC", "pubImpl"];
     var stub = createStubs(publish, toStub);
 
     publish.standard(fixture.isTest, fixture.options);
 
     assert(stub.checkChanges.calledOnce, "checkChanges should have been called");
+    assert(stub.tagVC.calledOnce, "tagVC should have been called");
+    assert(stub.tagVC.calledWith(fixture.isTest, modulePackage.version, fixture.options), "tagVC should have been called with: " + fixture.isTest + " ," + modulePackage.version + " ," + fixture.options);
     assert(stub.pubImpl.calledOnce, "pubImpl should have been called");
     assert(stub.pubImpl.calledWith(fixture.isTest, fixture.options), "pubImpl should have been called with: " + fixture.isTest + ", " + optsString);
 

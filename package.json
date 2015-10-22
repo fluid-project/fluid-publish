@@ -1,6 +1,6 @@
 {
   "name": "fluid-publish",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A command line tool and node module that can be used to simplify the process of publishing a module to NPM. This is particularly useful for creating development releases, e.g. nightly or continuous integration releases.",
   "main": "publish.js",
   "engines": {
@@ -47,6 +47,8 @@
     "versionCmd": "npm version --no-git-tag-version ${version}",
     "distTagCmd": "npm dist-tag add ${packageName}@${version} ${tag}",
     "cleanCmd": "git checkout -- package.json",
+    "vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'",
+    "pushVCTagCmd": "git push upstream v${version}",
     "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
     "devTag": "dev",
     "moduleRoot": ""

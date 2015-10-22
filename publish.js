@@ -54,6 +54,21 @@ publish.getCLIOpts = function () {
     return opts;
 };
 
+
+/**
+ * Returns the contents of a package.json file as JSON object
+ *
+ * @param moduleRoot {String} - the path to the root where the package.json is
+ *                              located. Will use process.cwd() by default.
+ * @returns {Object} - returns the contents of the package.json file as a JSON
+ *                     object.
+ */
+publish.getPkg = function (moduleRoot) {
+    moduleRoot = moduleRoot || process.cwd();
+    var modulePkgPath = path.join(moduleRoot, "package.json");
+    return require(modulePkgPath);
+};
+
 /**
  * Creates a number with 0's padded on the left
  *
@@ -125,6 +140,25 @@ publish.checkChanges = function (options) {
 };
 
 /**
+ * Calls publish.execSync with a
+ * If it is a test run, the command will be output to the console.
+ *
+ * @param cmdTemplate {String} - A string template of the command to execute.
+ *                               Can provide tokens in the form ${tokenName}
+ * @param values {Object} - the tokens and their replacement.
+                            e.g. {tokenName: "value to insert"}
+ * @param isTest {Boolean} - indicates if this is a test run or not
+ */
+ publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, isTest) {
+     var cmdStr = es6Template(cmdTemplate, cmdValues);
+     if (isTest) {
+         publish.log("command: " + cmdStr);
+     } else {
+         publish.execSync(cmdStr);
+     }
+ };
+
+/**
  * Updates the package.json version to the specified version
  * This does not commit the change, it will only modify the file.
  *
@@ -133,10 +167,10 @@ publish.checkChanges = function (options) {
  */
 publish.setVersion = function (version, options) {
     var cmdTemplate = options.versionCmd || defaults.versionCmd;
-    var cmdStr = es6Template(cmdTemplate, {
+
+    publish.execSyncFromTemplate(cmdTemplate, {
         version: version
     });
-    publish.execSync(cmdStr);
 };
 
 /**
@@ -187,20 +221,36 @@ publish.pubImpl = function (isTest, options) {
  * @param isTest {Boolean} - indicates if this is a test run or not
  * @param version {String} - a string indicating which version to tag
  * @param tag {String} - the dist-tag to apply
- * @param options {Object} - e.g. "npm dist-tag add ${packageName}@${version} ${tag}"
+ * @param options {Object} - e.g. {"distTagCmd": "npm dist-tag add ${packageName}@${version} ${tag}"}
  */
 publish.tag = function (isTest, packageName, version, tag, options) {
     var cmdTemplate = options.distTagCmd || defaults.distTagCmd;
-    var cmdStr = es6Template(cmdTemplate, {
+
+    publish.execSyncFromTemplate(cmdTemplate, {
         packageName: packageName,
         version: version,
         tag: tag
+    }, isTest);
+};
+
+/**
+ * Applies a version control tag to the latest commit
+ *
+ * @param isTest {Boolean} - indicates if this is a test run or not
+ * @param version {String} - a string indicating the version
+ * @param options {Object} - e.g. {"vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'", "pushVCTagCmd": "git push upstream v${version}"}
+ */
+publish.tagVC = function (isTest, version, options) {
+    var cmdTemplates = [
+        options.vcTagCmd || defaults.vcTagCmd,
+        options.pushVCTagCmd || defaults.pushVCTagCmd
+    ];
+
+    cmdTemplates.forEach(function (cmdTemplate) {
+        publish.execSyncFromTemplate(cmdTemplate, {
+            version: version
+        }, isTest);
     });
-    if (isTest) {
-        publish.log("tag command: " + cmdStr);
-    } else {
-        publish.execSync(cmdStr);
-    }
 };
 
 /**
@@ -242,8 +292,7 @@ publish.dev = function (isTest, options) {
 
     // The package.json file of the top level package which is
     // running this module.
-    var modulePkgPath = path.join(opts.moduleRoot || process.cwd(), "package.json");
-    var modulePkg = require(modulePkgPath);
+    var modulePkg = publish.getPkg(opts.moduleRoot);
 
     // Ensure no uncommitted changes
     publish.checkChanges(opts);
@@ -253,6 +302,7 @@ publish.dev = function (isTest, options) {
     // set the version number
     publish.setVersion(devVersion, opts);
 
+    // publish
     publish.pubImpl(isTest, opts);
     publish.tag(isTest, modulePkg.name, devVersion, opts.devTag, opts);
 
@@ -264,6 +314,8 @@ publish.dev = function (isTest, options) {
  * Publishes a standard release build.
  * This creates a release named after the version in the package.json file.
  * It will not increase the version number, this must be done separately.
+ * However, it will create a tag and publish this tag to the version control
+ * system.
  *
  * @param isTest {Boolean} - indicates if this is a test run
  * @param options {Object} - see defaultOptions in package.json for possible values
@@ -271,9 +323,17 @@ publish.dev = function (isTest, options) {
 publish.standard = function (isTest, options) {
     var opts = extend(true, {}, defaults, options);
 
+    // The package.json file of the top level package which is
+    // running this module.
+    var modulePkg = publish.getPkg(opts.moduleRoot);
+
     // Ensure no uncommitted changes
     publish.checkChanges(opts);
 
+    // create version control tag
+    publish.tagVC (isTest, modulePkg.version, opts);
+
+    // publish
     publish.pubImpl(isTest, opts);
 };
 
