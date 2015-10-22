@@ -14,8 +14,6 @@ https://github.com/fluid-project/first-discovery-server/raw/master/LICENSE.txt
 
 var publish = {};
 var path = require("path");
-var pkgPath = path.join(__dirname, "package.json");
-var pkg = require(pkgPath);
 var extend = require("extend");
 
 // execSync  and log are added to the exported "publish" namespace so they can
@@ -27,6 +25,21 @@ publish.log = console.log;
 // When version node.js 4.x.x is supported this can be replaced by native support.
 var es6Template = require("es6-template-strings");
 
+/**
+ * Returns the contents of a package.json file as JSON object
+ *
+ * @param moduleRoot {String} - the path to the root where the package.json is
+ *                              located. Will use process.cwd() by default.
+ * @returns {Object} - returns the contents of the package.json file as a JSON
+ *                     object.
+ */
+publish.getPkg = function (moduleRoot) {
+    moduleRoot = moduleRoot || process.cwd();
+    var modulePkgPath = path.join(moduleRoot, "package.json");
+    return require(modulePkgPath);
+};
+
+var pkg = publish.getPkg(__dirname);
 var defaults = pkg.defaultOptions;
 
 /**
@@ -52,21 +65,6 @@ publish.getCLIOpts = function () {
         }
     });
     return opts;
-};
-
-
-/**
- * Returns the contents of a package.json file as JSON object
- *
- * @param moduleRoot {String} - the path to the root where the package.json is
- *                              located. Will use process.cwd() by default.
- * @returns {Object} - returns the contents of the package.json file as a JSON
- *                     object.
- */
-publish.getPkg = function (moduleRoot) {
-    moduleRoot = moduleRoot || process.cwd();
-    var modulePkgPath = path.join(moduleRoot, "package.json");
-    return require(modulePkgPath);
 };
 
 /**
