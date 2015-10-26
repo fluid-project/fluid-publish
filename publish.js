@@ -188,7 +188,8 @@ publish.getDevVersion = function (moduleVersion, options) {
         version: moduleVersion,
         preRelease: preRelease,
         timestamp: timestamp,
-        revision: revision
+        // ensure that there are no leading or trailing whitespace characters
+        revision: revision.toString().trim()
     });
     return newStr;
 };
