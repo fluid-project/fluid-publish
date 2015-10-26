@@ -144,17 +144,17 @@ publish.checkChanges = function (options) {
  * @param cmdTemplate {String} - A string template of the command to execute.
  *                               Can provide tokens in the form ${tokenName}
  * @param values {Object} - the tokens and their replacement.
-                            e.g. {tokenName: "value to insert"}
+ *                          e.g. {tokenName: "value to insert"}
  * @param isTest {Boolean} - indicates if this is a test run or not
  */
- publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, isTest) {
-     var cmdStr = es6Template(cmdTemplate, cmdValues);
-     if (isTest) {
-         publish.log("command: " + cmdStr);
-     } else {
-         publish.execSync(cmdStr);
-     }
- };
+publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, isTest) {
+    var cmdStr = es6Template(cmdTemplate, cmdValues);
+    if (isTest) {
+        publish.log("command: " + cmdStr);
+    } else {
+        publish.execSync(cmdStr);
+    }
+};
 
 /**
  * Updates the package.json version to the specified version
