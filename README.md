@@ -127,6 +127,17 @@ publish.standard();
         </tr>
         <tr>
             <td>
+                <code>checkRemoteCmd</code>
+            </td>
+            <td>
+                The CLI to execute which determines if the remote repository exists. This prevents trying to push a version control tag to a repo that doesn't exist.
+            </td>
+            <td>
+                "git ls-remote --exit-code ${remote}"
+            </td>
+        </tr>
+        <tr>
+            <td>
                 <code>rawTimestampCmd</code>
             </td>
             <td>
@@ -296,6 +307,17 @@ publish.standard();
             </td>
             <td>
                 "dev"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>remoteName</code>
+            </td>
+            <td>
+                The remote repository to push version control tag to.
+            </td>
+            <td>
+                "upstream"
             </td>
         </tr>
     </tbody>

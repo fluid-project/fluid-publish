@@ -138,7 +138,7 @@ publish.checkChanges = function (options) {
 };
 
 /**
- * Calls publish.execSync with a
+ * Calls publish.execSync with a command crafted from a template string.
  * If it is a test run, the command will be output to the console.
  *
  * @param cmdTemplate {String} - A string template of the command to execute.
@@ -150,10 +150,23 @@ publish.checkChanges = function (options) {
 publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, isTest) {
     var cmdStr = es6Template(cmdTemplate, cmdValues);
     if (isTest) {
-        publish.log("command: " + cmdStr);
+        publish.log("command: " + cmdStr + " \n");
     } else {
         publish.execSync(cmdStr);
     }
+};
+
+/**
+ * Checks that the remote exists. If it does not exist an error is thrown.
+ *
+ * @param options {Object} - e.g. {"checkRemoteCmd": "git ls-remote --exit-code ${remote}", "remoteName": "upstream"}
+ */
+publish.checkRemote = function (options) {
+    var cmdTemplate = options.checkRemoteCmd || defaults.checkRemoteCmd;
+
+    publish.execSyncFromTemplate(cmdTemplate, {
+        remote: options.remoteName || defaults.remoteName
+    });
 };
 
 /**
@@ -237,7 +250,7 @@ publish.tag = function (isTest, packageName, version, tag, options) {
  *
  * @param isTest {Boolean} - indicates if this is a test run or not
  * @param version {String} - a string indicating the version
- * @param options {Object} - e.g. {"vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'", "pushVCTagCmd": "git push upstream v${version}"}
+ * @param options {Object} - e.g. {"vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'", "pushVCTagCmd": "git push ${remote} v${version}", "remoteName": "upstream"}
  */
 publish.tagVC = function (isTest, version, options) {
     var cmdTemplates = [
@@ -245,9 +258,12 @@ publish.tagVC = function (isTest, version, options) {
         options.pushVCTagCmd || defaults.pushVCTagCmd
     ];
 
+    var remote = options.remoteName || defaults.remoteName;
+
     cmdTemplates.forEach(function (cmdTemplate) {
         publish.execSyncFromTemplate(cmdTemplate, {
-            version: version
+            version: version,
+            remote: remote
         }, isTest);
     });
 };
@@ -328,6 +344,9 @@ publish.standard = function (isTest, options) {
 
     // Ensure no uncommitted changes
     publish.checkChanges(opts);
+
+    // Ensure that the specified remote repository exists
+    publish.checkRemote(opts);
 
     // create version control tag
     publish.tagVC (isTest, modulePkg.version, opts);

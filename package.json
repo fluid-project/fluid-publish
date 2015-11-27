@@ -40,6 +40,7 @@
   },
   "defaultOptions": {
     "changesCmd": "git status -s -uno",
+    "checkRemoteCmd": "git ls-remote --exit-code ${remote}",
     "rawTimestampCmd": "git show -s --format=%ct HEAD",
     "revisionCmd": "git rev-parse --verify --short HEAD",
     "packCmd": "npm pack",
@@ -48,9 +49,10 @@
     "distTagCmd": "npm dist-tag add ${packageName}@${version} ${tag}",
     "cleanCmd": "git checkout -- package.json",
     "vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'",
-    "pushVCTagCmd": "git push upstream v${version}",
+    "pushVCTagCmd": "git push ${remote} v${version}",
     "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
     "devTag": "dev",
+    "remoteName": "upstream",
     "moduleRoot": ""
   }
 }
