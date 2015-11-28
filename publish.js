@@ -16,14 +16,16 @@ var publish = {};
 var path = require("path");
 var extend = require("extend");
 
+// TODO: The supported version of node.js does not yet support ES6 template strings
+// When version node.js 4.x.x is supported this can be replaced by native support.
+var es6Template = require("es6-template-strings");
+
 // execSync  and log are added to the exported "publish" namespace so they can
 // be stubbed in the tests.
 publish.execSync = require("child_process").execSync;
 publish.log = console.log;
 
-// TODO: The supported version of node.js does not yet support ES6 template strings
-// When version node.js 4.x.x is supported this can be replaced by native support.
-var es6Template = require("es6-template-strings");
+
 
 /**
  * Returns the contents of a package.json file as JSON object
@@ -124,35 +126,50 @@ publish.convertToISO8601 = function (timestamp) {
 };
 
 /**
+ * Retrieves the requested option, or a default value if the option does not exist.
+ * The default value comes from the default object read in from the package.json file's
+ * "defaultOptions" property.
+ *
+ * @param options {Object} - e.g. {"key": "value"}
+ * @param key {String} - the particular option to look up and return the value for.
+ */
+publish.getOpt = function (options, key) {
+    return options[key] || defaults[key];
+};
+
+/**
+ * Calls publish.execSync with a command crafted from a template string.
+ * If it is a test run, the command will only be logged to the console.
+ *
+ * @param cmdTemplate {String} - A string template of the command to execute.
+ *                               Can provide tokens in the form ${tokenName}
+ * @param values {Object} - the tokens and their replacement.
+ *                          e.g. {tokenName: "value to insert"}
+ * @param isTest {Boolean} - indicates if this is a test run or not. If it is
+ *                           a test run, the command will be logged but not executed.
+ */
+publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, isTest) {
+    var cmdStr = es6Template(cmdTemplate, cmdValues);
+
+    publish.log("executing command: " + cmdStr + " \n");
+
+    if (!isTest) {
+        return publish.execSync(cmdStr);
+    }
+};
+
+/**
  * Throws an error if there are any uncommitted changes
  *
  * @param options {Object} - e.g. {"changesCmd": "git status -s -uno"}
  * @throws Error - An error object with a message containing a list of uncommitted changes.
  */
 publish.checkChanges = function (options) {
-    var cmdStr = options.changesCmd || defaults.changesCmd;
-    var changes = publish.execSync(cmdStr);
+    var cmdTemplate = publish.getOpt(options, "changesCmd");
+    var changes = publish.execSyncFromTemplate(cmdTemplate);
+
     if (changes.length) {
         throw new Error("You have uncommitted changes\n" + changes);
-    }
-};
-
-/**
- * Calls publish.execSync with a command crafted from a template string.
- * If it is a test run, the command will be output to the console.
- *
- * @param cmdTemplate {String} - A string template of the command to execute.
- *                               Can provide tokens in the form ${tokenName}
- * @param values {Object} - the tokens and their replacement.
- *                          e.g. {tokenName: "value to insert"}
- * @param isTest {Boolean} - indicates if this is a test run or not
- */
-publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, isTest) {
-    var cmdStr = es6Template(cmdTemplate, cmdValues);
-    if (isTest) {
-        publish.log("command: " + cmdStr + " \n");
-    } else {
-        publish.execSync(cmdStr);
     }
 };
 
@@ -162,7 +179,7 @@ publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, isTest) {
  * @param options {Object} - e.g. {"checkRemoteCmd": "git ls-remote --exit-code ${remote}", "remoteName": "upstream"}
  */
 publish.checkRemote = function (options) {
-    var cmdTemplate = options.checkRemoteCmd || defaults.checkRemoteCmd;
+    var cmdTemplate = publish.getOpt(options, "checkRemoteCmd");
 
     publish.execSyncFromTemplate(cmdTemplate, {
         remote: options.remoteName || defaults.remoteName
@@ -177,7 +194,7 @@ publish.checkRemote = function (options) {
  * @param options {Object} - e.g. {"versionCmd": "npm version --no-git-tag-version ${version}"}
  */
 publish.setVersion = function (version, options) {
-    var cmdTemplate = options.versionCmd || defaults.versionCmd;
+    var cmdTemplate = publish.getOpt(options, "versionCmd");
 
     publish.execSyncFromTemplate(cmdTemplate, {
         version: version
@@ -192,11 +209,15 @@ publish.setVersion = function (version, options) {
  * @returns {String} - the current dev version number
  */
 publish.getDevVersion = function (moduleVersion, options) {
-    var rawTimestamp = publish.execSync(options.rawTimestampCmd || defaults.rawTimestampCmd);
+    var rawTimestampCmdTemplate = publish.getOpt(options, "rawTimestampCmd");
+    var revisionCmdTemplate = publish.getOpt(options, "revisionCmd");
+    var devVersionTemplate = publish.getOpt(options, "devVersion");
+    var preRelease = publish.getOpt(options, "devTag");
+
+    var rawTimestamp = publish.execSyncFromTemplate(rawTimestampCmdTemplate);
     var timestamp = publish.convertToISO8601(rawTimestamp);
-    var revision = publish.execSync(options.revisionCmd || defaults.revisionCmd);
-    var preRelease = options.devTag || defaults.devTag;
-    var devVersionTemplate = options.devVersion || defaults.devVersion;
+    var revision = publish.execSyncFromTemplate(revisionCmdTemplate);
+
     var newStr = es6Template(devVersionTemplate, {
         version: moduleVersion,
         preRelease: preRelease,
@@ -217,12 +238,12 @@ publish.getDevVersion = function (moduleVersion, options) {
 publish.pubImpl = function (isTest, options) {
     if (isTest) {
         // create a local tarball
-        var packCmd = options.packCmd || defaults.packCmd;
-        publish.execSync(packCmd);
+        var packCmdTemplate = publish.getOpt(options, "packCmd");
+        publish.execSyncFromTemplate(packCmdTemplate);
     } else {
         // publish to npm
-        var publishCmd = options.publishCmd || defaults.publishCmd;
-        publish.execSync(publishCmd);
+        var publishCmdTemplate = publish.getOpt(options, "publishCmd");
+        publish.execSyncFromTemplate(publishCmdTemplate);
     }
 };
 
@@ -236,7 +257,7 @@ publish.pubImpl = function (isTest, options) {
  * @param options {Object} - e.g. {"distTagCmd": "npm dist-tag add ${packageName}@${version} ${tag}"}
  */
 publish.tag = function (isTest, packageName, version, tag, options) {
-    var cmdTemplate = options.distTagCmd || defaults.distTagCmd;
+    var cmdTemplate = publish.getOpt(options, "distTagCmd");
 
     publish.execSyncFromTemplate(cmdTemplate, {
         packageName: packageName,
@@ -253,14 +274,11 @@ publish.tag = function (isTest, packageName, version, tag, options) {
  * @param options {Object} - e.g. {"vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'", "pushVCTagCmd": "git push ${remote} v${version}", "remoteName": "upstream"}
  */
 publish.tagVC = function (isTest, version, options) {
-    var cmdTemplates = [
-        options.vcTagCmd || defaults.vcTagCmd,
-        options.pushVCTagCmd || defaults.pushVCTagCmd
-    ];
+    var cmds = ["vcTagCmd", "pushVCTagCmd"];
+    var remote = publish.getOpt(options, "remoteName");
 
-    var remote = options.remoteName || defaults.remoteName;
-
-    cmdTemplates.forEach(function (cmdTemplate) {
+    cmds.forEach(function (cmd) {
+        var cmdTemplate = publish.getOpt(options, cmd);
         publish.execSyncFromTemplate(cmdTemplate, {
             version: version,
             remote: remote
@@ -277,14 +295,14 @@ publish.tagVC = function (isTest, version, options) {
  * @param options {Object} - e.g. {"cleanCmd": "git checkout -- package.json"}
  */
 publish.clean = function (moduleRoot, options) {
-    var cmdStr = options.cleanCmd || defaults.cleanCmd;
+    var cmdTemplate = publish.getOpt(options, "cleanCmd");
     var originalDir = process.cwd();
 
     // change to the module root directory
     process.chdir(moduleRoot || "./");
 
     // run the clean command
-    publish.execSync(cmdStr);
+    publish.execSyncFromTemplate(cmdTemplate);
 
     // restore the working directory
     process.chdir(originalDir);
