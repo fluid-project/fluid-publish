@@ -320,6 +320,72 @@ publish.standard();
                 "upstream"
             </td>
         </tr>
+        <tr>
+            <td>
+                <code>changesHint</code>
+            </td>
+            <td>
+                A hint for addressing uncommitted changes.
+            </td>
+            <td>
+                "Address uncommitted changes: Commit \"git commit -a\", Stash \"git stash\" or Clean \"git reset --hard\"\n"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>checkRemoteHint</code>
+            </td>
+            <td>
+                A hint for addressing an issue where the remote repository cannot be found.
+            </td>
+            <td>
+                "Run \"git remote -v\" for a list of available remote repositories.\n"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>publishHint</code>
+            </td>
+            <td>
+                A hint for addressing an issue where publishing to the registry fails.
+            </td>
+            <td>
+                "Ensure that you have access to publish to the registry and that the current version does not already exist.\n"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>distTagHint</code>
+            </td>
+            <td>
+                A hint for addressing an issue where applying a distribution tag fails.
+            </td>
+            <td>
+                "If the tag already exists use a new tag name or run \"npm dist-tag rm ${packageName} ${tag}\" to remove the existing one.\nAlso ensure that the tag name is valid (i.e. doesn't conform to a valid semver range like v1.4 or 1.4).\n"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>vcTagHint</code>
+            </td>
+            <td>
+                A hint for addressing an issue where applying a version control tag fails.
+            </td>
+            <td>
+                "If the tag already exists, run \"git tag -d v${version}\" to remove the existing tag.\n"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>pushVCTagHint</code>
+            </td>
+            <td>
+                A hint for addressing an issue where pushing a version control tag to a remote repository fails.
+            </td>
+            <td>
+                "If the tag already exists, run \"git push ${remote} :refs/tags/v${version} to remove the existing tag.\n"
+            </td>
+        </tr>
     </tbody>
 </table>
 

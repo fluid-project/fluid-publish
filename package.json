@@ -53,6 +53,12 @@
     "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
     "devTag": "dev",
     "remoteName": "upstream",
-    "moduleRoot": ""
+    "moduleRoot": "",
+    "changesHint": "Address uncommitted changes: Commit \"git commit -a\", Stash \"git stash\" or Clean \"git reset --hard\"\n",
+    "checkRemoteHint": "Run \"git remote -v\" for a list of available remote repositories.\n",
+    "publishHint": "Ensure that you have access to publish to the registry and that the current version does not already exist.\n",
+    "distTagHint": "If the tag already exists use a new tag name or run \"npm dist-tag rm ${packageName} ${tag}\" to remove the existing one.\nAlso ensure that the tag name is valid (i.e. doesn't conform to a valid semver range like v1.4 or 1.4).\n",
+    "vcTagHint": "If the tag already exists, run \"git tag -d v${version}\" to remove the existing tag.\n",
+    "pushVCTagHint": "If the tag already exists, run \"git push ${remote} :refs/tags/v${version} to remove the existing tag.\n"
   }
 }
