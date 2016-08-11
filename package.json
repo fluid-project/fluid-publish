@@ -30,13 +30,13 @@
   "homepage": "http://fluidproject.org",
   "dependencies": {
     "es6-template-strings": "2.0.0",
-    "extend": "^3.0.0"
+    "extend": "3.0.0"
   },
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-jshint": "~0.9.0",
+    "grunt": "0.4.5",
+    "fluid-grunt-eslint": "18.1.1",
     "grunt-jsonlint": "1.0.4",
-    "sinon": "^1.17.1"
+    "sinon": "1.17.1"
   },
   "defaultOptions": {
     "changesCmd": "git status -s -uno",

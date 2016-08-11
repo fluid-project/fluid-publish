@@ -1,5 +1,5 @@
 /*
-Copyright 2015 OCAD University
+Copyright 2015-2016 OCAD University
 
 Licensed under the New BSD license. You may not use this file except in
 compliance with this License.
@@ -7,6 +7,7 @@ compliance with this License.
 You may obtain a copy of the License at
 https://github.com/fluid-project/first-discovery-server/raw/master/LICENSE.txt
 */
+/* eslint-env node */
 
 "use strict";
 
@@ -195,8 +196,8 @@ execSyncFromTemplateFixture.forEach(function (fixture) {
 
     console.log("execSyncFromTemplate test with exception - template: " + fixture.template + " values: " + JSON.stringify(fixture.values) + " isTest: " + false);
 
-    stub.execSync.throws("Error message");
-    assert.throws(function () {publish.execSyncFromTemplate(fixture.template, fixture.values, fixture.hint);}, Error);
+    stub.execSync["throws"]("Error message");
+    assert["throws"](function () {publish.execSyncFromTemplate(fixture.template, fixture.values, fixture.hint);}, Error);
     assert(stub.execSync.called, "execSync should have been called");
     assert(stub.execSync.calledWith(fixture.expected), "execSync should have been called with: " + fixture.expected);
     assert(stub.log.calledTwice, "log should have been called twice");

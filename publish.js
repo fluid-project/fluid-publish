@@ -10,6 +10,8 @@ You may obtain a copy of the License at
 https://github.com/fluid-project/first-discovery-server/raw/master/LICENSE.txt
 */
 
+/* eslint-env node */
+
 "use strict";
 
 var publish = {};
@@ -51,7 +53,7 @@ publish.getCLIOpts = function () {
         options: {}
     };
 
-    process.argv.forEach(function(val, index) {
+    process.argv.forEach(function (val, index) {
         if (index > 1) {
             var opt = val.split("=");
 
