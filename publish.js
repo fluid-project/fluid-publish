@@ -18,8 +18,9 @@ var publish = {};
 var path = require("path");
 var extend = require("extend");
 
-// TODO: The supported version of node.js does not yet support ES6 template strings
-// When version node.js 4.x.x is supported this can be replaced by native support.
+// Using the es6-template-strings module instead of the native ES6 Template Literals
+// because Template Literals require the template to be surrounded in "`", which are not
+// accepted as valid JSON ( the defaults are stored in the package.json file ).
 var es6Template = require("es6-template-strings");
 
 // execSync  and log are added to the exported "publish" namespace so they can
