@@ -148,7 +148,7 @@ publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, hint, isTest) {
         } catch (error) {
             var hintStr = es6Template(hint, cmdValues);
             publish.log("Hint: " + hintStr);
-            throw(error);
+            throw (error);
         }
     }
 };
