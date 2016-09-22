@@ -417,6 +417,37 @@ cleanFixture.forEach(function (fixture) {
     publish.execSync.restore();
 });
 
+/********************************
+ * publish.getPublishPkgVersion *
+ ********************************/
+console.log("\n*** publish.getPublishPkgVersion ***");
+
+var getPublishPkgVersionFixture = [{
+    packageJson: {
+        name: "test-package",
+        version: "1.0.0"
+    },
+    expectedLog: "test-package 1.0.0"
+}];
+
+getPublishPkgVersionFixture.forEach(function (fixture) {
+    console.log("getPublishPkgVersion test - version: " + fixture.expectedLog);
+
+    var toStub = ["getPkg", "log"];
+    var stub = createStubs(publish, toStub);
+
+    stub.getPkg.returns(fixture.packageJson);
+
+    var version = publish.getPublishPkgVersion();
+    assert.equal(version, fixture.packageJson.version, "The version number " + fixture.packageJson.version + " should have been returned");
+    assert(stub.log.calledOnce, "publish.log should have been called once");
+    assert(stub.log.calledWith(fixture.expectedLog), "publish.log should have been called with: " + fixture.expectedLog);
+
+    // remove stubs
+    removeStubs(publish, toStub);
+});
+
+
 /*****************
  * publish tests *
  *****************/

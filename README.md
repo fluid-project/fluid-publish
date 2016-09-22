@@ -31,6 +31,20 @@ fluid-publish
 
 __value__: true (Boolean)
 
+Returns the current version of the Fluid-Publish module itself. No publishing
+steps will occur when this flag is enabled.
+
+```bash
+# returns the version of fluid-publish
+fluid-publish --version
+# fluid-publish 2.0.0
+```
+
+
+#### --standard ####
+
+__value__: true (Boolean)
+
 Specifies that a standard release should be generated. This creates a release named after the version in the package.json file. It will not increase the version number. However, it will create a tag and publish this tag to the version control system.
 
 ```bash

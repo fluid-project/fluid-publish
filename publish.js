@@ -287,6 +287,12 @@ publish.clean = function (moduleRoot, options) {
     process.chdir(originalDir);
 };
 
+publish.getPublishPkgVersion = function () {
+    var publishPkg = publish.getPkg(__dirname);
+    publish.log(publishPkg.name + " " + publishPkg.version);
+    return publishPkg.version;
+};
+
 /**
  * Publishes a development build.
  * This creates a release named after the version, but with the build stamp
@@ -362,7 +368,9 @@ if (require.main === module) {
     var isTest = opts["--test"];
     var options = JSON.parse(opts["--options"] || "{}");
 
-    if (opts["--standard"]) {
+    if (opts["--version"]) {
+        publish.getPublishPkgVersion();
+    } else if (opts["--standard"]) {
         publish.standard(isTest, options);
     } else {
         publish.dev(isTest, options);
