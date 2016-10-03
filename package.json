@@ -34,6 +34,7 @@
   },
   "devDependencies": {
     "grunt": "1.0.1",
+    "eslint-config-fluid": "1.0.0",
     "fluid-grunt-eslint": "18.1.2",
     "grunt-jsonlint": "1.0.4",
     "sinon": "1.17.1"
