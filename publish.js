@@ -50,9 +50,7 @@ publish.getPkg = function (moduleRoot) {
  * @returns {Object} - the CLI arguments as an options object
  */
 publish.getCLIOpts = function () {
-    var opts = {
-        options: {}
-    };
+    var opts = {};
 
     process.argv.forEach(function (val, index) {
         if (index > 1) {
@@ -366,14 +364,13 @@ if (require.main === module) {
 
     var opts = publish.getCLIOpts();
     var isTest = opts["--test"];
-    var options = JSON.parse(opts["--options"] || "{}");
 
     if (opts["--version"]) {
         publish.getPublishPkgVersion();
     } else if (opts["--standard"]) {
-        publish.standard(isTest, options);
+        publish.standard(isTest, opts);
     } else {
-        publish.dev(isTest, options);
+        publish.dev(isTest, opts);
     }
 
 }

@@ -68,17 +68,15 @@ fluid-publish
 fluid-publish --standard
 ```
 
-#### --options #####
+#### options #####
 
-__value__: {String} stringified JSON object
-
-A stringified JSON object containing overrides to the default options used across the publish script. The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key.
+Optional key/value pairs, in the form `key=value`, to overide the default configuration used across the publish script. The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key.
 
 (See: [Options](#options))
 
 ```bash
 # publishes a dev build and applies the tag "nightly" to it
-fluid-publish --options="{'devTag': 'nightly'}"
+fluid-publish devTag="nightly"
 ```
 
 ### JavaScript API ###
