@@ -15,7 +15,7 @@ npm install fluid-publish --save-dev
 
 ## Usage ##
 
-### Command Line ###
+### Command Line API ###
 
 Run these commands from the root directory of the module to be published.
 
@@ -27,7 +27,7 @@ fluid-publish
 ./node_modules/.bin/fluid-publish
 ```
 
-#### --standard ####
+#### --version ####
 
 __value__: true (Boolean)
 
@@ -81,12 +81,10 @@ A stringified JSON object containing overrides to the default options used acros
 fluid-publish --options="{'devTag': 'nightly'}"
 ```
 
-### Node ###
+### JavaScript API ###
 
-##### parameters #####
+fluid.publish can also be accessed through standard JavaScript function calls in a  [node](https://nodejs.org) app.
 
- * isTest {Boolean} - Indicates if this is a test run, if true a tarball will be generated instead of publishing to NPM.
- * options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key. (See: [Options](#options))
 
 #### `dev` ####
 
@@ -97,10 +95,10 @@ var publish = require("fluid-publish");
 publish.dev();
 ```
 
-##### parameters #####
+##### arguments #####
 
-* isTest {Boolean} - Indicates if this is a test run, if true a tarball will be generated instead of publishing to NPM.
-* options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key. (See: [Options](#options))
+ 1. isTest {Boolean} - Indicates if this is a test run, if true a tarball will be generated instead of publishing to NPM.
+ 2. options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key. (See: [Options](#options))
 
 #### `standard` ####
 
@@ -110,6 +108,11 @@ Publishes a release build. This creates a release named after the version in the
 var publish = require("fluid-publish");
 publish.standard();
 ```
+
+##### arguments #####
+
+ 1. isTest {Boolean} - Indicates if this is a test run, if true a tarball will be generated instead of publishing to NPM.
+ 2. options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key. (See: [Options](#options))
 
 ## Options ##
 
