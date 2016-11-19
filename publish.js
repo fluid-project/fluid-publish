@@ -293,8 +293,15 @@ publish.dev = function (isTest, options) {
     // running this module.
     var modulePkg = publish.getPkg(opts.moduleRoot);
 
+    var checkChange = options.checkChanges;
+    if (checkChange === undefined) {
+        checkChange = true;
+    }
+
     // Ensure no uncommitted changes
-    publish.checkChanges(opts);
+    if (checkChange) {
+        publish.checkChanges(opts);
+    }
 
     var devVersion = publish.getDevVersion(modulePkg.version, opts);
 
@@ -326,8 +333,15 @@ publish.standard = function (isTest, options) {
     // running this module.
     var modulePkg = publish.getPkg(opts.moduleRoot);
 
+    var checkChange = options.checkChanges;
+    if (checkChange === undefined) {
+        checkChange = true;
+    }
+
     // Ensure no uncommitted changes
-    publish.checkChanges(opts);
+    if (checkChange) {
+       publish.checkChanges(opts);
+    }
 
     // create version control tag
     publish.tagVC (isTest, modulePkg.version, opts);
