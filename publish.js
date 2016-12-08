@@ -46,6 +46,11 @@ publish.getPkg = function (moduleRoot) {
 
 /**
  * Processes the argv command line arguments into an object
+ * Options are expected to be key/value pairs in the format of `key=value`.
+ * When only a key is provided, that is no "=" symbol is found, the value
+ * is set to true.
+ *
+ * see: https://nodejs.org/docs/latest/api/process.html#process_process_argv
  *
  * @returns {Object} - the CLI arguments as an options object
  */
@@ -56,9 +61,11 @@ publish.getCLIOpts = function () {
         if (index > 1) {
             var opt = val.split("=");
 
-            // convert "false" to boolean
+            // convert "true" and "false" to the respective boolean value
             if (opt[1] === "false") {
                 opt[1] = false;
+            } else if (opt[1] === "true") {
+                opt[1] = true;
             }
 
             opts[opt[0]] = opt.length < 2 ? true : opt[1];

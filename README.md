@@ -70,9 +70,11 @@ fluid-publish --standard
 
 #### options #####
 
-Optional key/value pairs, in the form `key=value`, to overide the default configuration used across the publish script. The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key.
+Optional key/value pairs, in the form `key=value`, to override the default configuration used across the publish script. The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key.
 
-(See: [Options](#options))
+<em><strong>NOTE</strong>: If only a <code>key</code> is provided, the value is assumed to be <code>true</code></em>
+
+(See: [Options](#options), [process.argv](https://nodejs.org/docs/latest/api/process.html#process_process_argv))
 
 ```bash
 # publishes a dev build and applies the tag "nightly" to it
