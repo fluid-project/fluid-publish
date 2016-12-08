@@ -138,7 +138,7 @@ var execSyncFromTemplateFixture = [{
     hint: "hint for single token template",
     expectedHint: "Hint: hint for single token template",
     expected: "value one",
-    expectedLog: "Executing Command: value one\n"
+    expectedLog: "Executing Command: value one"
 }, {
     template: "${value1} and ${value2}",
     values: {
@@ -148,7 +148,7 @@ var execSyncFromTemplateFixture = [{
     hint: "hint for multi-token template",
     expectedHint: "Hint: hint for multi-token template",
     expected: "value one and value two",
-    expectedLog: "Executing Command: value one and value two\n"
+    expectedLog: "Executing Command: value one and value two"
 }, {
     template: "${value1} to ${value2} and back to ${value1}",
     values: {
@@ -158,7 +158,7 @@ var execSyncFromTemplateFixture = [{
     hint: "hint for reused token template",
     expectedHint: "Hint: hint for reused token template",
     expected: "value one to value two and back to value one",
-    expectedLog: "Executing Command: value one to value two and back to value one\n"
+    expectedLog: "Executing Command: value one to value two and back to value one"
 }, {
     template: "no value",
     values: {
@@ -168,7 +168,7 @@ var execSyncFromTemplateFixture = [{
     hint: "hint for no value test",
     expectedHint: "Hint: hint for no value test",
     expected: "no value",
-    expectedLog: "Executing Command: no value\n"
+    expectedLog: "Executing Command: no value"
 }, {
     template: "$ {noToken}",
     values: {
@@ -177,7 +177,7 @@ var execSyncFromTemplateFixture = [{
     hint: "hint for no token test",
     expectedHint: "Hint: hint for no token test",
     expected: "$ {noToken}",
-    expectedLog: "Executing Command: $ {noToken}\n"
+    expectedLog: "Executing Command: $ {noToken}"
 }];
 
 execSyncFromTemplateFixture.forEach(function (fixture) {
@@ -375,7 +375,7 @@ tagFixture.forEach(function (fixture) {
 
     var toStub = ["execSync", "log"];
     var stub = createStubs(publish, toStub);
-    var expectedLog = "Executing Command: " + fixture.expected + "\n";
+    var expectedLog = "Executing Command: " + fixture.expected;
 
     publish.tag(fixture.isTest, fixture.packageName, fixture.version, fixture.tag, fixture);
 
