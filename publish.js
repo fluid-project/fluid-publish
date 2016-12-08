@@ -138,7 +138,7 @@ publish.convertToISO8601 = function (timestamp) {
  */
 publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, hint, isTest) {
     var cmdStr = es6Template(cmdTemplate, cmdValues);
-    publish.log("Executing Command: " + cmdStr + "\n");
+    publish.log("Executing Command: " + cmdStr);
 
     if (!isTest) {
         try {
