@@ -319,12 +319,15 @@ publish.dev = function (isTest, options) {
     // set the version number
     publish.setVersion(devVersion, opts);
 
-    // publish
-    publish.pubImpl(isTest, opts);
-    publish.tag(isTest, modulePkg.name, devVersion, opts.devTag, opts);
+    try {
+        // publish
+        publish.pubImpl(isTest, opts);
+        publish.tag(isTest, modulePkg.name, devVersion, opts.devTag, opts);
+    } finally {
+        // cleanup changes
+        publish.clean(opts.moduleRoot, opts);
+    };
 
-    // cleanup changes
-    publish.clean(opts.moduleRoot, opts);
 };
 
 /**
