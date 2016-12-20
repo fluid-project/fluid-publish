@@ -199,6 +199,18 @@ publish.standard();
         </tr>
         <tr>
             <td>
+                <code>publishDevCmd</code>
+            </td>
+            <td>
+                The CLI to execute which publishes a development release to NPM.
+                Uses the value specified by the `devTag` option.
+            </td>
+            <td>
+                "npm publish --tag ${devTag}"
+            </td>
+        </tr>
+        <tr>
+            <td>
                 <code>versionCmd</code>
             </td>
             <td>
@@ -211,33 +223,6 @@ publish.standard();
             </td>
             <td>
                 "npm version --no-git-tag-version ${version}"
-                <br>
-                <br>
-                <p>
-                    <em><strong>NOTE</strong>: This command will update the version in the package.json file, but will not commit the change.</em>
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <code>distTagCmd</code>
-            </td>
-            <td>
-                The CLI to execute which tags an NPM release.
-                <ul>
-                    <li>
-                        <code>${packageName}</code> will be substituted with executing module's name.
-                    </li>
-                    <li>
-                        <code>${version}</code> will be substituted with the generated dev build version.
-                    </li>
-                    <li>
-                        <code>${tag}</code>will be substituted with the value from the <code>devTag</code> option.
-                    </li>
-                </ul>
-            </td>
-            <td>
-                "npm dist-tag add ${packageName}@${version} ${tag}"
                 <br>
                 <br>
                 <p>
@@ -372,13 +357,13 @@ publish.standard();
         </tr>
         <tr>
             <td>
-                <code>distTagHint</code>
+                <code>publishDevHint</code>
             </td>
             <td>
-                A hint for addressing an issue where applying a distribution tag fails.
+                A hint for addressing an issue where publishing to the registry fails.
             </td>
             <td>
-                "If the tag already exists use a new tag name or run \"npm dist-tag rm ${packageName} ${tag}\" to remove the existing one.\nAlso ensure that the tag name is valid (i.e. doesn't conform to a valid semver range like v1.4 or 1.4).\n"
+                "Ensure that you have access to publish to the registry and that the current version does not already exist.\nIf the tag already exists use a new tag name or run \"npm dist-tag rm ${packageName} ${tag}\" to remove the existing one.\nAlso ensure that the tag name is valid (i.e. doesn't conform to a valid semver range like v1.4 or 1.4).\n"
             </td>
         </tr>
         <tr>

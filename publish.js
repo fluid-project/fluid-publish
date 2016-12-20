@@ -223,33 +223,18 @@ publish.getDevVersion = function (moduleVersion, options) {
  * If isTest is specified, it will instead create a tarball in the local directory.
  *
  * @param isTest {Boolean} - indicates if this is a test run or not
- * @param options {Object} - e.g. {"packCmd": "npm pack", "publishCmd": "npm publish", "publishHint": "publish hint"}
+ * @param isDev {Boolean} - indicates if this is a development (true) or standard (false) release
+ * @param options {Object} - e.g. {"packCmd": "npm pack", "publishCmd": "npm publish", "publishDevCmd": "npm publish --tag", "publishHint": "publish hint", "publishDevHint": "publish dev hint", devTag: "dev"}
  */
-publish.pubImpl = function (isTest, options) {
+publish.pubImpl = function (isTest, isDev, options) {
     if (isTest) {
         // create a local tarball
         publish.execSyncFromTemplate(options.packCmd);
     } else {
         // publish to npm
-        publish.execSyncFromTemplate(options.publishCmd, {}, options.publishHint);
+        var pubCmd = isDev ? options.publishDevCmd : options.publishCmd;
+        publish.execSyncFromTemplate(pubCmd, options, options.publishHint);
     }
-};
-
-/**
- * Tags the specified version with the specified dist-tag
- * If it is a test run, the tag command will be output to the console.
- *
- * @param isTest {Boolean} - indicates if this is a test run or not
- * @param version {String} - a string indicating which version to tag
- * @param tag {String} - the dist-tag to apply
- * @param options {Object} - e.g. {"distTagCmd": "npm dist-tag add ${packageName}@${version} ${tag}", "distTagHint": "dist tag hint"}
- */
-publish.tag = function (isTest, packageName, version, tag, options) {
-    publish.execSyncFromTemplate(options.distTagCmd, {
-        packageName: packageName,
-        version: version,
-        tag: tag
-    }, options.distTagHint, isTest);
 };
 
 /**
@@ -328,8 +313,7 @@ publish.dev = function (isTest, options) {
 
     try {
         // publish
-        publish.pubImpl(isTest, opts);
-        publish.tag(isTest, modulePkg.name, devVersion, opts.devTag, opts);
+        publish.pubImpl(isTest, true, opts);
     } finally {
         // cleanup changes
         publish.clean(opts.moduleRoot, opts);
@@ -365,7 +349,7 @@ publish.standard = function (isTest, options) {
     publish.tagVC (isTest, modulePkg.version, opts);
 
     // publish
-    publish.pubImpl(isTest, opts);
+    publish.pubImpl(isTest, false, opts);
 };
 
 module.exports = publish;
