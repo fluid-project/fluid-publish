@@ -349,7 +349,7 @@ publish.standard();
                 <code>publishHint</code>
             </td>
             <td>
-                A hint for addressing an issue where publishing to the registry fails.
+                A hint for addressing an issue where publishing a standard release to the registry fails.
             </td>
             <td>
                 "Ensure that you have access to publish to the registry and that the current version does not already exist.\n"
@@ -360,7 +360,7 @@ publish.standard();
                 <code>publishDevHint</code>
             </td>
             <td>
-                A hint for addressing an issue where publishing to the registry fails.
+                A hint for addressing an issue where publishing a development (pre-release) to the registry fails.
             </td>
             <td>
                 "Ensure that you have access to publish to the registry and that the current version does not already exist.\nIf the tag already exists use a new tag name or run \"npm dist-tag rm ${packageName} ${tag}\" to remove the existing one.\nAlso ensure that the tag name is valid (i.e. doesn't conform to a valid semver range like v1.4 or 1.4).\n"
