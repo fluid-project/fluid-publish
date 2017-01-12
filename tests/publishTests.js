@@ -316,6 +316,9 @@ getDevVersionFixture.forEach(function (fixture) {
  *******************/
 console.log("\n*** publish.pubImpl ***");
 
+// In the cases where commands should not execute,
+// their entry in the structure has been filled with a
+// placeholder string beginning with "shouldn't"
 var pubImplFixture = [{
     isTest: true,
     isDev: false,
