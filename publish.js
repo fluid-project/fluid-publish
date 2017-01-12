@@ -233,7 +233,8 @@ publish.pubImpl = function (isTest, isDev, options) {
     } else {
         // publish to npm
         var pubCmd = isDev ? options.publishDevCmd : options.publishCmd;
-        publish.execSyncFromTemplate(pubCmd, options, options.publishHint);
+        var pubHint = isDev ? options.publishDevHint : options.publishHint;
+        publish.execSyncFromTemplate(pubCmd, options, pubHint);
     }
 };
 
