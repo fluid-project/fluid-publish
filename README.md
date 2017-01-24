@@ -363,9 +363,7 @@ publish.standard();
                 A hint for addressing an issue where publishing a development (pre-release) to the registry fails.
             </td>
             <td>
-                "Ensure that you have access to publish to the registry and that the current version does not already exist.\nIf the tag already exists use a new tag name or run \"npm dist-tag rm ${packageName} ${tag}\" to remove the existing one.\nTags share a namespace with versions. To reduce confusion, tags that can be interpreted as semver values, will be rejected.\n"
-
-                Also ensure that the tag name is valid (i.e. doesn't conform to a valid semver range like v1.4 or 1.4).\n"
+                "Ensure that you have access to publish to the registry and that the current version does not already exist.\nIf the npm tag specified by --tag is recognizable as a valid semver version number, it will be rejected by npm. This is because version numbers and tags share a common namespace for npm packages.\n"
             </td>
         </tr>
         <tr>
