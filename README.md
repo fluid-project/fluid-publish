@@ -15,7 +15,7 @@ npm install fluid-publish --save-dev
 
 ## Usage ##
 
-### Command Line ###
+### Command Line API ###
 
 Run these commands from the root directory of the module to be published.
 
@@ -26,6 +26,20 @@ fluid-publish
 # creates a dev release (local install)
 ./node_modules/.bin/fluid-publish
 ```
+
+#### --version ####
+
+__value__: true (Boolean)
+
+Returns the current version of the Fluid-Publish module itself. No publishing
+steps will occur when this flag is enabled.
+
+```bash
+# returns the version of fluid-publish
+fluid-publish --version
+# fluid-publish 2.0.0
+```
+
 
 #### --standard ####
 
@@ -54,25 +68,23 @@ fluid-publish
 fluid-publish --standard
 ```
 
-#### --options #####
+#### options #####
 
-__value__: {String} stringified JSON object
+Optional key/value pairs, in the form `key=value`, to override the default configuration used across the publish script. The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key.
 
-A stringified JSON object containing overrides to the default options used across the publish script. The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key.
+<em><strong>NOTE</strong>: If only a <code>key</code> is provided, the value is assumed to be <code>true</code></em>
 
-(See: [Options](#options))
+(See: [Options](#options), [process.argv](https://nodejs.org/docs/latest/api/process.html#process_process_argv))
 
 ```bash
 # publishes a dev build and applies the tag "nightly" to it
-fluid-publish --options="{'devTag': 'nightly'}"
+fluid-publish devTag="nightly"
 ```
 
-### Node ###
+### JavaScript API ###
 
-##### parameters #####
+fluid.publish can also be accessed through standard JavaScript function calls in a  [node](https://nodejs.org) app.
 
- * isTest {Boolean} - Indicates if this is a test run, if true a tarball will be generated instead of publishing to NPM.
- * options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key. (See: [Options](#options))
 
 #### `dev` ####
 
@@ -83,10 +95,10 @@ var publish = require("fluid-publish");
 publish.dev();
 ```
 
-##### parameters #####
+##### arguments #####
 
-* isTest {Boolean} - Indicates if this is a test run, if true a tarball will be generated instead of publishing to NPM.
-* options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key. (See: [Options](#options))
+ 1. isTest {Boolean} - Indicates if this is a test run, if true a tarball will be generated instead of publishing to NPM.
+ 2. options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key. (See: [Options](#options))
 
 #### `standard` ####
 
@@ -96,6 +108,11 @@ Publishes a release build. This creates a release named after the version in the
 var publish = require("fluid-publish");
 publish.standard();
 ```
+
+##### arguments #####
+
+ 1. isTest {Boolean} - Indicates if this is a test run, if true a tarball will be generated instead of publishing to NPM.
+ 2. options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key. (See: [Options](#options))
 
 ## Options ##
 
@@ -123,6 +140,17 @@ publish.standard();
             </td>
             <td>
                 "git status -s -uno"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>checkRemoteCmd</code>
+            </td>
+            <td>
+                The CLI to execute which determines if the remote repository exists. This prevents trying to push a version control tag to a repo that doesn't exist.
+            </td>
+            <td>
+                "git ls-remote --exit-code ${remote}"
             </td>
         </tr>
         <tr>
@@ -171,6 +199,18 @@ publish.standard();
         </tr>
         <tr>
             <td>
+                <code>publishDevCmd</code>
+            </td>
+            <td>
+                The CLI to execute which publishes a development release to NPM.
+                Uses the value specified by the `devTag` option.
+            </td>
+            <td>
+                "npm publish --tag ${devTag}"
+            </td>
+        </tr>
+        <tr>
+            <td>
                 <code>versionCmd</code>
             </td>
             <td>
@@ -183,33 +223,6 @@ publish.standard();
             </td>
             <td>
                 "npm version --no-git-tag-version ${version}"
-                <br>
-                <br>
-                <p>
-                    <em><strong>NOTE</strong>: This command will update the version in the package.json file, but will not commit the change.</em>
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <code>distTagCmd</code>
-            </td>
-            <td>
-                The CLI to execute which tags an NPM release.
-                <ul>
-                    <li>
-                        <code>${packageName}</code> will be substituted with executing module's name.
-                    </li>
-                    <li>
-                        <code>${version}</code> will be substituted with the generated dev build version.
-                    </li>
-                    <li>
-                        <code>${tag}</code>will be substituted with the value from the <code>devTag</code> option.
-                    </li>
-                </ul>
-            </td>
-            <td>
-                "npm dist-tag add ${packageName}@${version} ${tag}"
                 <br>
                 <br>
                 <p>
@@ -296,6 +309,83 @@ publish.standard();
             </td>
             <td>
                 "dev"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>remoteName</code>
+            </td>
+            <td>
+                The remote repository to push version control tag to.
+            </td>
+            <td>
+                "upstream"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>changesHint</code>
+            </td>
+            <td>
+                A hint for addressing uncommitted changes.
+            </td>
+            <td>
+                "Address uncommitted changes: Commit \"git commit -a\", Stash \"git stash\" or Clean \"git reset --hard\"\n"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>checkRemoteHint</code>
+            </td>
+            <td>
+                A hint for addressing an issue where the remote repository cannot be found.
+            </td>
+            <td>
+                "Run \"git remote -v\" for a list of available remote repositories.\n"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>publishHint</code>
+            </td>
+            <td>
+                A hint for addressing an issue where publishing a standard release to the registry fails.
+            </td>
+            <td>
+                "Ensure that you have access to publish to the registry and that the current version does not already exist.\n"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>publishDevHint</code>
+            </td>
+            <td>
+                A hint for addressing an issue where publishing a development (pre-release) to the registry fails.
+            </td>
+            <td>
+                "Ensure that you have access to publish to the registry and that the current version does not already exist.\nIf the npm tag specified by --tag is recognizable as a valid semver version number, it will be rejected by npm. This is because version numbers and tags share a common namespace for npm packages.\n"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>vcTagHint</code>
+            </td>
+            <td>
+                A hint for addressing an issue where applying a version control tag fails.
+            </td>
+            <td>
+                "If the tag already exists, run \"git tag -d v${version}\" to remove the existing tag.\n"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>pushVCTagHint</code>
+            </td>
+            <td>
+                A hint for addressing an issue where pushing a version control tag to a remote repository fails.
+            </td>
+            <td>
+                "If the tag already exists, run \"git push ${remote} :refs/tags/v${version} to remove the existing tag.\n"
             </td>
         </tr>
     </tbody>

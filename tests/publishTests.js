@@ -1,5 +1,5 @@
 /*
-Copyright 2015 OCAD University
+Copyright 2015-2016 OCAD University
 
 Licensed under the New BSD license. You may not use this file except in
 compliance with this License.
@@ -7,6 +7,7 @@ compliance with this License.
 You may obtain a copy of the License at
 https://github.com/fluid-project/first-discovery-server/raw/master/LICENSE.txt
 */
+/* eslint-env node */
 
 "use strict";
 
@@ -23,13 +24,21 @@ var createStubs = function (obj, methods) {
     return stubs;
 };
 
+var resetStubs = function (obj, methods) {
+    methods.forEach(function (method) {
+        obj[method].reset();
+    });
+};
+
 var removeStubs = function (obj, methods) {
     methods.forEach(function (method) {
         obj[method].restore();
     });
 };
 
-// publish.getPkg
+/******************
+ * publish.getPkg *
+ ******************/
 console.log("\n*** publish.getPkg ***");
 
 var getPkgFixture = [{
@@ -48,7 +57,9 @@ getPkgFixture.forEach(function (fixture) {
     assert.deepEqual(result, fixture.expected, "Expected pkg: " + JSON.stringify(fixture.expected) + " actual: " + JSON.stringify(result));
 });
 
-// publish.padZeros
+/********************
+ * publish.padZeros *
+ ********************/
 console.log("\n*** publish.padZeros ***");
 
 var padZerosFixture = {
@@ -73,7 +84,9 @@ padZerosFixture.nums.forEach(function (num, numIdx) {
     });
 });
 
-// publish.fromTimestamp
+/*************************
+ * publish.fromTimestamp *
+ *************************/
 console.log("\n*** publish.fromTimestamp ***");
 
 var fromTimestampFixture = [{
@@ -95,7 +108,9 @@ fromTimestampFixture.forEach(function (fixture) {
     assert.deepEqual(result, fixture.expected, "Expected adjusted date object: " + JSON.stringify(fixture.expected) + " actual: " + JSON.stringify(result));
 });
 
-// publish.convertToISO8601
+/****************************
+ * publish.convertToISO8601 *
+ ****************************/
 console.log("\n*** publish.convertToISO8601 ***");
 
 var convertToISO6801Fixture = [{
@@ -110,38 +125,9 @@ convertToISO6801Fixture.forEach(function (fixture) {
     assert.equal(result, fixture.expected, "Expected ISO8601 timestamp: " + fixture.expected + " actual: " + result);
 });
 
-// publish.checkChanges
-console.log("\n*** publish.checkChanges ***");
-
-var checkChangesFixture = [{
-    cmdStr: "test command string",
-    cmdReturn: ""
-}, {
-    cmdStr: "test command string",
-    cmdReturn: "some changes",
-    errorMsg: "You have uncommitted changes\nsome changes"
-}];
-
-checkChangesFixture.forEach(function (fixture) {
-    console.log("checkChanges test - changes: " + fixture.cmdReturn);
-
-    var exec = sinon.stub(publish, "execSync");
-    exec.returns(fixture.cmdReturn);
-
-    try {
-        publish.checkChanges({changesCmd: fixture.cmdStr});
-        assert(exec.called, "execSync should have been called");
-        assert(exec.calledWith(fixture.cmdStr), "execSync should have been called with: " + fixture.cmdStr);
-
-    } catch (e) {
-        assert.equal(e.message, fixture.errorMsg, "The errorMsg should have been called correctly. expected: " + fixture.errorMsg + " actual: " + e.message);
-    }
-
-    // remove execSync stub
-    publish.execSync.restore();
-});
-
-// publish.execSyncFromTemplate
+/********************************
+ * publish.execSyncFromTemplate *
+ ********************************/
 console.log("\n*** publish.execSyncFromTemplate ***");
 
 var execSyncFromTemplateFixture = [{
@@ -149,39 +135,49 @@ var execSyncFromTemplateFixture = [{
     values: {
         value1: "value one"
     },
+    hint: "hint for single token template",
+    expectedHint: "Hint: hint for single token template",
     expected: "value one",
-    expectedLog: "command: value one"
+    expectedLog: "Executing Command: value one"
 }, {
     template: "${value1} and ${value2}",
     values: {
         value1: "value one",
         value2: "value two"
     },
+    hint: "hint for multi-token template",
+    expectedHint: "Hint: hint for multi-token template",
     expected: "value one and value two",
-    expectedLog: "command: value one and value two"
+    expectedLog: "Executing Command: value one and value two"
 }, {
     template: "${value1} to ${value2} and back to ${value1}",
     values: {
         value1: "value one",
         value2: "value two"
     },
+    hint: "hint for reused token template",
+    expectedHint: "Hint: hint for reused token template",
     expected: "value one to value two and back to value one",
-    expectedLog: "command: value one to value two and back to value one"
+    expectedLog: "Executing Command: value one to value two and back to value one"
 }, {
     template: "no value",
     values: {
         value1: "value one",
         value2: "value two"
     },
+    hint: "hint for no value test",
+    expectedHint: "Hint: hint for no value test",
     expected: "no value",
-    expectedLog: "command: no value"
+    expectedLog: "Executing Command: no value"
 }, {
     template: "$ {noToken}",
     values: {
         noToken: "no token"
     },
+    hint: "hint for no token test",
+    expectedHint: "Hint: hint for no token test",
     expected: "$ {noToken}",
-    expectedLog: "command: $ {noToken}"
+    expectedLog: "Executing Command: $ {noToken}"
 }];
 
 execSyncFromTemplateFixture.forEach(function (fixture) {
@@ -191,23 +187,75 @@ execSyncFromTemplateFixture.forEach(function (fixture) {
 
     console.log("execSyncFromTemplate test - template: " + fixture.template + " values: " + JSON.stringify(fixture.values) + " isTest: " + false);
 
-    publish.execSyncFromTemplate(fixture.template, fixture.values);
+    publish.execSyncFromTemplate(fixture.template, fixture.values, fixture.hint);
     assert(stub.execSync.called, "execSync should have been called");
     assert(stub.execSync.calledWith(fixture.expected), "execSync should have been called with: " + fixture.expected);
-    assert(!stub.log.called, "log should not have been called");
+    assert(stub.log.calledOnce, "log should have been called only once");
+    assert.equal(stub.log.args[0][0], fixture.expectedLog, "log should have been called with: " + fixture.expectedLog);
+    resetStubs(publish, toStub);
+
+    console.log("execSyncFromTemplate test with exception - template: " + fixture.template + " values: " + JSON.stringify(fixture.values) + " isTest: " + false);
+
+    stub.execSync["throws"]("Error message");
+    assert["throws"](function () {publish.execSyncFromTemplate(fixture.template, fixture.values, fixture.hint);}, Error);
+    assert(stub.execSync.called, "execSync should have been called");
+    assert(stub.execSync.calledWith(fixture.expected), "execSync should have been called with: " + fixture.expected);
+    assert(stub.log.calledTwice, "log should have been called twice");
+    assert.equal(stub.log.args[0][0], fixture.expectedLog, "log should have been called with: " + fixture.expectedLog);
+    assert.equal(stub.log.args[1][0], fixture.expectedHint, "log should have been called with: " + fixture.expectedHint);
+    resetStubs(publish, toStub);
 
     console.log("execSyncFromTemplate test - template: " + fixture.template + " values: " + JSON.stringify(fixture.values) + " isTest: " + true);
 
-    publish.execSyncFromTemplate(fixture.template, fixture.values, true);
-    assert(stub.log.called, "log should have been called");
-    assert(stub.log.calledWith(fixture.expectedLog), "log should have been called with: " + fixture.expectedLog);
-    // using calledOnce because exec should have been called in the previous execSyncFromTemplate call.
-    assert(stub.execSync.calledOnce, "execSync should not have been called");
+    publish.execSyncFromTemplate(fixture.template, fixture.values, fixture.hint, true);
+    assert(stub.log.calledOnce, "log should have been called twice");
+    assert.equal(stub.log.args[0][0], fixture.expectedLog, "log should have been called with: " + fixture.expectedLog);
+    assert.equal(stub.execSync.callCount, 0, "execSync should not have been called");
+
+    // removes stubs
+    removeStubs(publish, toStub);
+});
+
+/************************
+ * publish.checkChanges *
+ ************************/
+console.log("\n*** publish.checkChanges ***");
+
+var checkChangesFixture = [{
+    cmdStr: "test command string",
+    cmdReturn: ""
+}, {
+    cmdStr: "test command string",
+    cmdReturn: "some changes",
+    errorMsg: "You have uncommitted changes\nsome changes",
+    hint: "hint"
+}];
+
+checkChangesFixture.forEach(function (fixture) {
+    console.log("checkChanges test - changes: " + fixture.cmdReturn);
+
+    var toStub = ["execSync", "log"];
+    var stub = createStubs(publish, toStub);
+    stub.execSync.returns(fixture.cmdReturn);
+
+    try {
+        publish.checkChanges({changesCmd: fixture.cmdStr, changesHint: fixture.hint});
+        assert(stub.execSync.called, "execSync should have been called");
+        assert(stub.execSync.calledWith(fixture.cmdStr), "execSync should have been called with: " + fixture.cmdStr);
+
+    } catch (e) {
+        var expectedHint = "Hint: " + fixture.hint;
+        assert(stub.log.calledWith(expectedHint), "log should have been called with: " + expectedHint);
+        assert.equal(e.message, fixture.errorMsg, "The errorMsg should have been called correctly. expected: " + fixture.errorMsg + " actual: " + e.message);
+    }
 
     removeStubs(publish, toStub);
 });
 
-// publish.setVersion
+
+/**********************
+ * publish.setVersion *
+ **********************/
 console.log("\n*** publish.setVersion ***");
 
 var setVersionFixture = [{
@@ -229,7 +277,9 @@ setVersionFixture.forEach(function (fixture) {
     publish.execSync.restore();
 });
 
-// publish.getDevVersion
+/*************************
+ * publish.getDevVersion *
+ *************************/
 console.log("\n*** publish.getDevVersion ***");
 
 var getDevVersionFixture = [{
@@ -261,29 +311,71 @@ getDevVersionFixture.forEach(function (fixture) {
     publish.execSync.restore();
 });
 
-// publish.pubImpl
+/*******************
+ * publish.pubImpl *
+ *******************/
 console.log("\n*** publish.pubImpl ***");
 
+// In the cases where commands should not execute,
+// their entry in the structure has been filled with a
+// placeholder string beginning with "shouldn't"
 var pubImplFixture = [{
     isTest: true,
+    isDev: false,
     packCmd: "pack",
-    publishCmd: "shouldn't publish"
+    publishCmd: "shouldn't publish",
+    publishDevCmd: "shouldn't publish dev"
+}, {
+    isTest: false,
+    isDev: false,
+    packCmd: "shouldn't pack",
+    publishCmd: "publish",
+    publishDevCmd: "shouldn't publish dev"
+}, {
+    isDev: false,
+    packCmd: "shouldn't pack",
+    publishCmd: "publish",
+    publishDevCmd: "shouldn't publish dev"
+}, {
+    isDev: true,
+    packCmd: "shouldn't pack",
+    publishCmd: "shouldn't publish",
+    publishDevCmd: "publish dev"
+}, {
+    isTest: false,
+    isDev: true,
+    packCmd: "pack",
+    publishCmd: "shouldn't publish",
+    publishDevCmd: "publish dev"
+}, {
+    isTest: true,
+    isDev: true,
+    packCmd: "pack",
+    publishCmd: "shouldn't publish",
+    publishDevCmd: "shouldn't publish dev"
 }, {
     isTest: false,
     packCmd: "shouldn't pack",
-    publishCmd: "publish"
+    publishCmd: "publish",
+    publishDevCmd: "shouldn't publish dev"
+}, {
+    isTest: true,
+    packCmd: "pack",
+    publishCmd: "shouldn't publish",
+    publishDevCmd: "shouldn't publish dev"
 }, {
     packCmd: "shouldn't pack",
-    publishCmd: "publish"
+    publishCmd: "publish",
+    publishDevCmd: "shouldn't publish dev"
 }];
 
 pubImplFixture.forEach(function (fixture) {
-    console.log("pubImpl test - isTest: " + fixture.isTest + " packCmd: " + fixture.packCmd + " publishCmd: " + fixture.publishCmd);
+    console.log("pubImpl test - isTest: " + fixture.isTest + "isDev: " + fixture.isDev + " packCmd: " + fixture.packCmd + " publishCmd: " + fixture.publishCmd + " publishDevCmd: " + fixture.publishDevCmd);
 
     var exec = sinon.stub(publish, "execSync");
-    var expected = fixture[fixture.isTest ? "packCmd" : "publishCmd"];
+    var expected = fixture.isTest ? fixture.packCmd : fixture[fixture.isDev ? "publishDevCmd" : "publishCmd"];
 
-    publish.pubImpl(fixture.isTest, fixture);
+    publish.pubImpl(fixture.isTest, fixture.isDev, fixture);
     assert(exec.calledOnce, "execSync should have been called");
     assert(exec.calledWith(expected), "execSync should have been called with: " + expected);
 
@@ -291,55 +383,9 @@ pubImplFixture.forEach(function (fixture) {
     publish.execSync.restore();
 });
 
-// publish.tag
-console.log("\n*** publish.tag ***");
-
-var tagFixture = [{
-    isTest: true,
-    packageName: "test1",
-    version: "1.0.0",
-    tag: "tag",
-    distTagCmd: "add tag ${tag} to ${packageName} at ${version}",
-    expected: "command: add tag tag to test1 at 1.0.0"
-}, {
-    isTest: false,
-    packageName: "test2",
-    version: "2.0.0",
-    tag: "tag2",
-    distTagCmd: "add tag ${tag} to ${packageName} at ${version}",
-    expected: "add tag tag2 to test2 at 2.0.0"
-}, {
-    version: "3.0.0",
-    packageName: "test3",
-    tag: "tag3",
-    distTagCmd: "add tag ${tag} to ${packageName} at ${version}",
-    expected: "add tag tag3 to test3 at 3.0.0"
-}];
-
-tagFixture.forEach(function (fixture) {
-    console.log("tag test - isTest: " + fixture.isTest + " packageName: " + fixture.packageName + " version: " + fixture.version + " tag: " + fixture.tag + " distTagCmd: " + fixture.distTagCmd);
-
-    var exec = sinon.stub(publish, "execSync");
-    var log = sinon.stub(publish, "log");
-
-    publish.tag(fixture.isTest, fixture.packageName, fixture.version, fixture.tag, fixture);
-
-    if (fixture.isTest) {
-        assert(log.calledOnce, "console.log should have been called");
-        assert(log.calledWith(fixture.expected), "console.log should have been called with: " + fixture.expected);
-        assert(!exec.called, "execSync should not have been called");
-    } else {
-        assert(exec.calledOnce, "execSync should have been called");
-        assert(exec.calledWith(fixture.expected), "execSync should have been called with: " + fixture.expected);
-        assert(!log.called, "console.log should not have been called");
-    }
-
-    // remove execSync and log stubs
-    publish.execSync.restore();
-    publish.log.restore();
-});
-
-// publish.clean
+/*****************
+ * publish.clean *
+ *****************/
 console.log("\n*** publish.clean ***");
 
 var cleanFixture = [{
@@ -361,45 +407,96 @@ cleanFixture.forEach(function (fixture) {
     publish.execSync.restore();
 });
 
-// publish tests
+/********************************
+ * publish.getPublishPkgVersion *
+ ********************************/
+console.log("\n*** publish.getPublishPkgVersion ***");
+
+var getPublishPkgVersionFixture = [{
+    packageJson: {
+        name: "test-package",
+        version: "1.0.0"
+    },
+    expectedLog: "test-package 1.0.0"
+}];
+
+getPublishPkgVersionFixture.forEach(function (fixture) {
+    console.log("getPublishPkgVersion test - version: " + fixture.expectedLog);
+
+    var toStub = ["getPkg", "log"];
+    var stub = createStubs(publish, toStub);
+
+    stub.getPkg.returns(fixture.packageJson);
+
+    var version = publish.getPublishPkgVersion();
+    assert.equal(version, fixture.packageJson.version, "The version number " + fixture.packageJson.version + " should have been returned");
+    assert(stub.log.calledOnce, "publish.log should have been called once");
+    assert(stub.log.calledWith(fixture.expectedLog), "publish.log should have been called with: " + fixture.expectedLog);
+
+    // remove stubs
+    removeStubs(publish, toStub);
+});
+
+
+/*****************
+ * publish tests *
+ *****************/
 
 var publishFixture = [{
     isTest: true,
     options: {
         "changesCmd": "dry run get changes",
+        "checkRemoteCmd": "dry run check remote",
         "rawTimestampCmd": "dry run get rawTimestamp",
         "revisionCmd": "dry run get revision",
         "packCmd": "dry run pack",
         "publishCmd": "dry run publish",
+        "publishDevCmd": "dry run npm publish dev",
         "versionCmd": "dry run version",
-        "distTagCmd": "dry run set tag",
         "cleanCmd": "dry run clean",
         "vcTagCmd": "dry run vc tag",
         "pushVCTagCmd": "dry run push vc tag",
         "devVersion": "dry run ${version}-${preRelease}.${timestamp}.${revision}",
         "devTag": "dry run dev",
-        "moduleRoot": __dirname
+        "remoteName": "dry run remote",
+        "moduleRoot": __dirname,
+        "changesHint": "dry run changes hint\n",
+        "checkRemoteHint": "dry run check remote hint\n",
+        "publishHint": "dry run publish hint\n",
+        "publishDevHint": "dry run publish dev hint\n",
+        "vcTagHint": "dry run vc tag hint\n",
+        "pushVCTagHint": "dry run push vc tag hint\n"
     }
 }, {
     isTest: false,
     options: {
         "changesCmd": "get changes",
+        "checkRemoteCmd": "check remote",
         "rawTimestampCmd": "get rawTimestamp",
         "revisionCmd": "get revision",
         "packCmd": "pack",
         "publishCmd": "publish",
+        "publishDevCmd": "publish dev",
         "versionCmd": "version",
-        "distTagCmd": "set tag",
         "cleanCmd": "clean",
-        "vcTagCmd": "dry run vc tag",
-        "pushVCTagCmd": "dry run push vc tag",
+        "vcTagCmd": "vc tag",
+        "pushVCTagCmd": "push vc tag",
         "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
         "devTag": "dev",
-        "moduleRoot": __dirname
+        "remoteName": "remote",
+        "moduleRoot": __dirname,
+        "changesHint": "changes hint\n",
+        "checkRemoteHint": "check remote hint\n",
+        "publishHint": "publish hint\n",
+        "publishDevHint": "publish dev hint\n",
+        "vcTagHint": "vc tag hint\n",
+        "pushVCTagHint": "push vc tag hint\n"
     }
 }];
 
-// publish.dev
+/***************
+ * publish.dev *
+ ***************/
 console.log("\n*** publish.dev ***");
 
 publishFixture.forEach(function (fixture) {
@@ -408,7 +505,7 @@ publishFixture.forEach(function (fixture) {
     var optsString = JSON.stringify(fixture.options || {});
     console.log("dev test - isTest: " + fixture.isTest, " options: " + optsString + "\n");
 
-    var toStub = ["checkChanges", "getDevVersion", "setVersion", "pubImpl", "tag", "clean"];
+    var toStub = ["checkChanges", "getDevVersion", "setVersion", "pubImpl", "clean"];
     var stub = createStubs(publish, toStub);
     var moduleVersion = modulePackage.version;
     var devVersion = moduleVersion + "-testVersion";
@@ -423,16 +520,16 @@ publishFixture.forEach(function (fixture) {
     assert(stub.setVersion.calledOnce, "setVersion should have been called");
     assert(stub.setVersion.calledWith(devVersion, fixture.options), "setVersion should have been called with: " + devVersion + ", " + optsString);
     assert(stub.pubImpl.calledOnce, "pubImpl should have been called");
-    assert(stub.pubImpl.calledWith(fixture.isTest, fixture.options), modulePackage);
-    assert(stub.tag.calledOnce, "tag should have been called");
-    assert(stub.tag.calledWith(fixture.isTest, modulePackage.name, devVersion, fixture.options.devTag, fixture.options), "tag should have been called with: " + fixture.isTest + ", " + modulePackage.name + ", " + devVersion + ", " + fixture.options.devTag + ", " + optsString);
+    assert(stub.pubImpl.calledWith(fixture.isTest, true, fixture.options), modulePackage);
     assert(stub.clean.calledOnce, "clean should have been called");
-    assert(stub.clean.calledWith(fixture.options.moduleRoot, fixture.options), "clean should have been called with: " + fixture.options.moduleRoot + ", " + optsString);
+    assert(stub.clean.calledWith(fixture.options.moduleRoot, fixture.options), "clean should have been called with: " + fixture.options.moduleRoot + ", true, " + optsString);
 
     removeStubs(publish, toStub);
 });
 
-// publish.standard
+/********************
+ * publish.standard *
+ ********************/
 console.log("\n*** publish.standard ***");
 
 publishFixture.forEach(function (fixture) {
@@ -441,16 +538,18 @@ publishFixture.forEach(function (fixture) {
     var optsString = JSON.stringify(fixture.options || {});
     console.log("release test - isTest: " + fixture.isTest, " options: " + optsString + "\n");
 
-    var toStub = ["checkChanges", "tagVC", "pubImpl"];
+    var toStub = ["checkChanges", "checkRemote", "tagVC", "pubImpl"];
     var stub = createStubs(publish, toStub);
 
     publish.standard(fixture.isTest, fixture.options);
 
     assert(stub.checkChanges.calledOnce, "checkChanges should have been called");
+    assert(stub.checkRemote.calledOnce, "checkRemote should have been called");
+    assert(stub.checkRemote.calledWith(fixture.options), "checkRemote should have been called with: " + optsString);
     assert(stub.tagVC.calledOnce, "tagVC should have been called");
-    assert(stub.tagVC.calledWith(fixture.isTest, modulePackage.version, fixture.options), "tagVC should have been called with: " + fixture.isTest + " ," + modulePackage.version + " ," + fixture.options);
+    assert(stub.tagVC.calledWith(fixture.isTest, modulePackage.version, fixture.options), "tagVC should have been called with: " + fixture.isTest + " ," + modulePackage.version + " ," + optsString);
     assert(stub.pubImpl.calledOnce, "pubImpl should have been called");
-    assert(stub.pubImpl.calledWith(fixture.isTest, fixture.options), "pubImpl should have been called with: " + fixture.isTest + ", " + optsString);
+    assert(stub.pubImpl.calledWith(fixture.isTest, false, fixture.options), "pubImpl should have been called with: " + fixture.isTest + ", false, " + optsString);
 
     removeStubs(publish, toStub);
 });

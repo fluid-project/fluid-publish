@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 /*
-Copyright 2015 OCAD University
+Copyright 2015-2016 OCAD University
 
 Licensed under the New BSD license. You may not use this file except in
 compliance with this License.
@@ -10,20 +10,25 @@ You may obtain a copy of the License at
 https://github.com/fluid-project/first-discovery-server/raw/master/LICENSE.txt
 */
 
+/* eslint-env node */
+
 "use strict";
 
 var publish = {};
 var path = require("path");
 var extend = require("extend");
 
+// Using the es6-template-strings module instead of the native ES6 Template Literals
+// because Template Literals require the template to be surrounded in "`", which are not
+// accepted as valid JSON ( the defaults are stored in the package.json file ).
+var es6Template = require("es6-template-strings");
+
 // execSync  and log are added to the exported "publish" namespace so they can
 // be stubbed in the tests.
 publish.execSync = require("child_process").execSync;
 publish.log = console.log;
 
-// TODO: The supported version of node.js does not yet support ES6 template strings
-// When version node.js 4.x.x is supported this can be replaced by native support.
-var es6Template = require("es6-template-strings");
+
 
 /**
  * Returns the contents of a package.json file as JSON object
@@ -39,26 +44,28 @@ publish.getPkg = function (moduleRoot) {
     return require(modulePkgPath);
 };
 
-var pkg = publish.getPkg(__dirname);
-var defaults = pkg.defaultOptions;
-
 /**
  * Processes the argv command line arguments into an object
+ * Options are expected to be key/value pairs in the format of `key=value`.
+ * When only a key is provided, that is no "=" symbol is found, the value
+ * is set to true.
+ *
+ * see: https://nodejs.org/docs/latest/api/process.html#process_process_argv
  *
  * @returns {Object} - the CLI arguments as an options object
  */
 publish.getCLIOpts = function () {
-    var opts = {
-        options: {}
-    };
-    // print process.argv
-    process.argv.forEach(function(val, index) {
+    var opts = {};
+
+    process.argv.forEach(function (val, index) {
         if (index > 1) {
             var opt = val.split("=");
 
-            // convert "false" to boolean
+            // convert "true" and "false" to the respective boolean value
             if (opt[1] === "false") {
                 opt[1] = false;
+            } else if (opt[1] === "true") {
+                opt[1] = true;
             }
 
             opts[opt[0]] = opt.length < 2 ? true : opt[1];
@@ -124,36 +131,57 @@ publish.convertToISO8601 = function (timestamp) {
 };
 
 /**
- * Throws an error if there are any uncommitted changes
- *
- * @param options {Object} - e.g. {"changesCmd": "git status -s -uno"}
- * @throws Error - An error object with a message containing a list of uncommitted changes.
- */
-publish.checkChanges = function (options) {
-    var cmdStr = options.changesCmd || defaults.changesCmd;
-    var changes = publish.execSync(cmdStr);
-    if (changes.length) {
-        throw new Error("You have uncommitted changes\n" + changes);
-    }
-};
-
-/**
- * Calls publish.execSync with a
- * If it is a test run, the command will be output to the console.
+ * Calls publish.execSync with a command crafted from a template string.
+ * If it is a test run, the command will only be logged to the console.
  *
  * @param cmdTemplate {String} - A string template of the command to execute.
  *                               Can provide tokens in the form ${tokenName}
  * @param values {Object} - the tokens and their replacement.
  *                          e.g. {tokenName: "value to insert"}
- * @param isTest {Boolean} - indicates if this is a test run or not
+ * @param hint {String} - A string template of a hint for recovering from an error thrown by the executed command.
+ *                               Can provide tokens in the form ${tokenName}
+ * @param isTest {Boolean} - indicates if this is a test run or not. If it is
+ *                           a test run, the command will be logged but not executed.
  */
-publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, isTest) {
+publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, hint, isTest) {
     var cmdStr = es6Template(cmdTemplate, cmdValues);
-    if (isTest) {
-        publish.log("command: " + cmdStr);
-    } else {
-        publish.execSync(cmdStr);
+    publish.log("Executing Command: " + cmdStr);
+
+    if (!isTest) {
+        try {
+            return publish.execSync(cmdStr);
+        } catch (error) {
+            var hintStr = es6Template(hint, cmdValues);
+            publish.log("Hint: " + hintStr);
+            throw (error);
+        }
     }
+};
+
+/**
+ * Throws an error if there are any uncommitted changes
+ *
+ * @param options {Object} - e.g. {"changesCmd": "git status -s -uno", "changesHint": "change hint"}
+ * @throws Error - An error object with a message containing a list of uncommitted changes.
+ */
+publish.checkChanges = function (options) {
+    var changes = publish.execSyncFromTemplate(options.changesCmd);
+
+    if (changes.length) {
+        publish.log("Hint: " + options.changesHint);
+        throw new Error("You have uncommitted changes\n" + changes);
+    }
+};
+
+/**
+ * Checks that the remote exists. If it does not exist an error is thrown.
+ *
+ * @param options {Object} - e.g. {"checkRemoteCmd": "git ls-remote --exit-code ${remote}", "remoteName": "upstream", "checkRemoteHint": "check remote hint"}
+ */
+publish.checkRemote = function (options) {
+    publish.execSyncFromTemplate(options.checkRemoteCmd, {
+        remote: options.remoteName
+    }, options.checkRemoteHint);
 };
 
 /**
@@ -164,9 +192,7 @@ publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, isTest) {
  * @param options {Object} - e.g. {"versionCmd": "npm version --no-git-tag-version ${version}"}
  */
 publish.setVersion = function (version, options) {
-    var cmdTemplate = options.versionCmd || defaults.versionCmd;
-
-    publish.execSyncFromTemplate(cmdTemplate, {
+    publish.execSyncFromTemplate(options.versionCmd, {
         version: version
     });
 };
@@ -179,16 +205,14 @@ publish.setVersion = function (version, options) {
  * @returns {String} - the current dev version number
  */
 publish.getDevVersion = function (moduleVersion, options) {
-    var rawTimestamp = publish.execSync(options.rawTimestampCmd || defaults.rawTimestampCmd);
+    var rawTimestamp = publish.execSyncFromTemplate(options.rawTimestampCmd);
     var timestamp = publish.convertToISO8601(rawTimestamp);
-    var revision = publish.execSync(options.revisionCmd || defaults.revisionCmd);
-    var preRelease = options.devTag || defaults.devTag;
-    var devVersionTemplate = options.devVersion || defaults.devVersion;
-    var newStr = es6Template(devVersionTemplate, {
+    var revision = publish.execSyncFromTemplate(options.revisionCmd);
+
+    var newStr = es6Template(options.devVersion, {
         version: moduleVersion,
-        preRelease: preRelease,
+        preRelease: options.devTag,
         timestamp: timestamp,
-        // ensure that there are no leading or trailing whitespace characters
         revision: revision.toString().trim()
     });
     return newStr;
@@ -199,37 +223,19 @@ publish.getDevVersion = function (moduleVersion, options) {
  * If isTest is specified, it will instead create a tarball in the local directory.
  *
  * @param isTest {Boolean} - indicates if this is a test run or not
- * @param options {Object} - e.g. {"packCmd": "npm pack", "publishCmd": "npm publish"}
+ * @param isDev {Boolean} - indicates if this is a development (true) or standard (false) release
+ * @param options {Object} - e.g. {"packCmd": "npm pack", "publishCmd": "npm publish", "publishDevCmd": "npm publish --tag", "publishHint": "publish hint", "publishDevHint": "publish dev hint", devTag: "dev"}
  */
-publish.pubImpl = function (isTest, options) {
+publish.pubImpl = function (isTest, isDev, options) {
     if (isTest) {
         // create a local tarball
-        var packCmd = options.packCmd || defaults.packCmd;
-        publish.execSync(packCmd);
+        publish.execSyncFromTemplate(options.packCmd);
     } else {
         // publish to npm
-        var publishCmd = options.publishCmd || defaults.publishCmd;
-        publish.execSync(publishCmd);
+        var pubCmd = isDev ? options.publishDevCmd : options.publishCmd;
+        var pubHint = isDev ? options.publishDevHint : options.publishHint;
+        publish.execSyncFromTemplate(pubCmd, options, pubHint);
     }
-};
-
-/**
- * Tags the specified version with the specified dist-tag
- * If it is a test run, the tag command will be output to the console.
- *
- * @param isTest {Boolean} - indicates if this is a test run or not
- * @param version {String} - a string indicating which version to tag
- * @param tag {String} - the dist-tag to apply
- * @param options {Object} - e.g. {"distTagCmd": "npm dist-tag add ${packageName}@${version} ${tag}"}
- */
-publish.tag = function (isTest, packageName, version, tag, options) {
-    var cmdTemplate = options.distTagCmd || defaults.distTagCmd;
-
-    publish.execSyncFromTemplate(cmdTemplate, {
-        packageName: packageName,
-        version: version,
-        tag: tag
-    }, isTest);
 };
 
 /**
@@ -237,19 +243,18 @@ publish.tag = function (isTest, packageName, version, tag, options) {
  *
  * @param isTest {Boolean} - indicates if this is a test run or not
  * @param version {String} - a string indicating the version
- * @param options {Object} - e.g. {"vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'", "pushVCTagCmd": "git push upstream v${version}"}
+ * @param options {Object} - e.g. {"vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'", "pushVCTagCmd": "git push ${remote} v${version}", "remoteName": "upstream", "vcTagHint": "vc tag hint", "pushVCTagHint": "push vc tag hint"}
  */
 publish.tagVC = function (isTest, version, options) {
-    var cmdTemplates = [
-        options.vcTagCmd || defaults.vcTagCmd,
-        options.pushVCTagCmd || defaults.pushVCTagCmd
-    ];
+    publish.execSyncFromTemplate(options.vcTagCmd, {
+        version: version,
+        remote: options.remoteName
+    }, options.vcTagHint, isTest);
 
-    cmdTemplates.forEach(function (cmdTemplate) {
-        publish.execSyncFromTemplate(cmdTemplate, {
-            version: version
-        }, isTest);
-    });
+    publish.execSyncFromTemplate(options.pushVCTagCmd, {
+        version: version,
+        remote: options.remoteName
+    }, options.pushVCTagHint, isTest);
 };
 
 /**
@@ -261,17 +266,22 @@ publish.tagVC = function (isTest, version, options) {
  * @param options {Object} - e.g. {"cleanCmd": "git checkout -- package.json"}
  */
 publish.clean = function (moduleRoot, options) {
-    var cmdStr = options.cleanCmd || defaults.cleanCmd;
     var originalDir = process.cwd();
 
     // change to the module root directory
     process.chdir(moduleRoot || "./");
 
     // run the clean command
-    publish.execSync(cmdStr);
+    publish.execSyncFromTemplate(options.cleanCmd);
 
     // restore the working directory
     process.chdir(originalDir);
+};
+
+publish.getPublishPkgVersion = function () {
+    var publishPkg = publish.getPkg(__dirname);
+    publish.log(publishPkg.name + " " + publishPkg.version);
+    return publishPkg.version;
 };
 
 /**
@@ -287,7 +297,8 @@ publish.clean = function (moduleRoot, options) {
  * @param options {Object} - see defaultOptions in package.json for possible values
  */
 publish.dev = function (isTest, options) {
-    var opts = extend(true, {}, defaults, options);
+    var publishPkg = publish.getPkg(__dirname);
+    var opts = extend(true, {}, publishPkg.defaultOptions, options);
 
     // The package.json file of the top level package which is
     // running this module.
@@ -301,12 +312,14 @@ publish.dev = function (isTest, options) {
     // set the version number
     publish.setVersion(devVersion, opts);
 
-    // publish
-    publish.pubImpl(isTest, opts);
-    publish.tag(isTest, modulePkg.name, devVersion, opts.devTag, opts);
+    try {
+        // publish
+        publish.pubImpl(isTest, true, opts);
+    } finally {
+        // cleanup changes
+        publish.clean(opts.moduleRoot, opts);
+    };
 
-    // cleanup changes
-    publish.clean(opts.moduleRoot, opts);
 };
 
 /**
@@ -320,7 +333,8 @@ publish.dev = function (isTest, options) {
  * @param options {Object} - see defaultOptions in package.json for possible values
  */
 publish.standard = function (isTest, options) {
-    var opts = extend(true, {}, defaults, options);
+    var publishPkg = publish.getPkg(__dirname);
+    var opts = extend(true, {}, publishPkg.defaultOptions, options);
 
     // The package.json file of the top level package which is
     // running this module.
@@ -329,11 +343,14 @@ publish.standard = function (isTest, options) {
     // Ensure no uncommitted changes
     publish.checkChanges(opts);
 
+    // Ensure that the specified remote repository exists
+    publish.checkRemote(opts);
+
     // create version control tag
     publish.tagVC (isTest, modulePkg.version, opts);
 
     // publish
-    publish.pubImpl(isTest, opts);
+    publish.pubImpl(isTest, false, opts);
 };
 
 module.exports = publish;
@@ -342,12 +359,13 @@ if (require.main === module) {
 
     var opts = publish.getCLIOpts();
     var isTest = opts["--test"];
-    var options = JSON.parse(opts["--options"] || "{}");
 
-    if (opts["--standard"]) {
-        publish.standard(isTest, options);
+    if (opts["--version"]) {
+        publish.getPublishPkgVersion();
+    } else if (opts["--standard"]) {
+        publish.standard(isTest, opts);
     } else {
-        publish.dev(isTest, options);
+        publish.dev(isTest, opts);
     }
 
 }
