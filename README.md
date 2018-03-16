@@ -235,10 +235,10 @@ publish.standard();
                 <code>cleanCmd</code>
             </td>
             <td>
-                The CLI to execute which cleans up any temporary changes to the package.json file.
+                The CLI to execute which cleans up any temporary changes to the package.json and package-lock.json files.
                 <ul>
                     <li>
-                        <code>${package}</code> will be substituted with the path to the executing modules package.json file.
+                        <code>${package}</code> will be substituted with the path to the executing modules package.json and package-lock.json files.
                     </li>
                 </ul>
             </td>

@@ -263,7 +263,7 @@ publish.tagVC = function (isTest, version, options) {
  * Used internally to reset version number changes in package.json
  * @param moduleRoot {String} - the directory where the package.json file to
                                 clean is located in.
- * @param options {Object} - e.g. {"cleanCmd": "git checkout -- package.json"}
+ * @param options {Object} - e.g. {"cleanCmd": "git checkout -- package.json package-lock.json"}
  */
 publish.clean = function (moduleRoot, options) {
     var originalDir = process.cwd();
