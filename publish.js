@@ -273,16 +273,25 @@ publish.clean = function (moduleRoot, options) {
     // change to the module root directory
     process.chdir(moduleRoot || "./");
 
-    // check whether files are being tracked or not
-    if(publish.execSyncFromTemplate(options.checkFilesTracking, {
-            filesToClean: options.filesToClean
-        })
-    ){
-        // run the clean command if files are being tracked
-        publish.execSyncFromTemplate(options.cleanCmd, {
-            filesToClean: options.filesToClean
-        });
-    }
+    var file = options.filesToClean.split(" ");
+    
+    file.forEach(function(file){
+        var isTracked = true;
+
+        // check whether file is being tracked or not
+        try {publish.execSyncFromTemplate(options.checkFilesTracking, {
+                filesToClean: file
+            }, options.checkFilesTrackingHint);
+        } catch (error) {
+            isTracked = false;
+        }
+        
+        if (isTracked)
+            // run the clean command if file is being tracked
+            publish.execSyncFromTemplate(options.cleanCmd, {
+                filesToClean: file
+            });
+    });
     
     // restore the working directory
     process.chdir(originalDir);

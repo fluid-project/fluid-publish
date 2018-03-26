@@ -61,6 +61,7 @@
     "checkRemoteHint": "Run \"git remote -v\" for a list of available remote repositories.\n",
     "publishHint": "Ensure that you have access to publish to the registry and that the current version does not already exist.\n",
     "publishDevHint": "Ensure that you have access to publish to the registry and that the current version does not already exist.\nIf the npm tag specified by --tag is recognizable as a valid semver version number, it will be rejected by npm. This is because version numbers and tags share a common namespace for npm packages.\n",
+    "checkFilesTrackingHint": "Either the file ${filesToClean} is not being tracked or does not exist.",
     "vcTagHint": "If the tag already exists, run \"git tag -d v${version}\" to remove the existing tag.\n",
     "pushVCTagHint": "If the tag already exists, run \"git push ${remote} :refs/tags/v${version} to remove the existing tag.\n"
   }
