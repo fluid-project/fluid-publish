@@ -198,23 +198,31 @@ publish.setVersion = function (version, options) {
 };
 
 /**
- * Calculates the current dev version of the package
+ * Calculates the current dev version of the package.
+ * Will include version metadata if run on a branch other than master, or if
+ * the versionMetadata option is provided.
  *
  * @param moduleVersion {String} - The version of the module (e.g. X.x.x)
- * @param options {Object} - e.g. {"rawTimestampCmd": "git show -s --format=%ct HEAD", "revisionCmd": "git rev-parse --verify --short HEAD", "devVersion": "${version}-${preRelease}.${timestamp}.${revision}", "devTag": "dev"}
+ * @param options {Object} - e.g. {"rawTimestampCmd": "git show -s --format=%ct HEAD", "revisionCmd": "git rev-parse --verify --short HEAD", "branchCmd": "git rev-parse --abbrev-ref HEAD", "devVersion": "${version}-${preRelease}.${timestamp}.${revision}", "versionMetadata": "", "devTag": "dev"}
  * @returns {String} - the current dev version number
  */
 publish.getDevVersion = function (moduleVersion, options) {
     var rawTimestamp = publish.execSyncFromTemplate(options.rawTimestampCmd);
     var timestamp = publish.convertToISO8601(rawTimestamp);
-    var revision = publish.execSyncFromTemplate(options.revisionCmd);
+    var revision = publish.execSyncFromTemplate(options.revisionCmd).toString().trim();
+    var branch = publish.execSyncFromTemplate(options.branchCmd).toString().trim();
 
     var newStr = es6Template(options.devVersion, {
         version: moduleVersion,
         preRelease: options.devTag,
         timestamp: timestamp,
-        revision: revision.toString().trim()
+        revision: revision
     });
+
+    if (branch !== "master" || options.versionMetadata) {
+        newStr = newStr + "+" + (options.versionMetadata || branch);
+    }
+
     return newStr;
 };
 
