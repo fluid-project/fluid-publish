@@ -313,14 +313,10 @@ publish.standard();
         </tr>
         <tr>
             <td>
-                <code>versionMetadata</code>
+                <code>devName</code>
             </td>
             <td>
-                <p>
-                    Any metadata to be appended to the version. This will be appended with a "+" (e.g. 3.0.0.dev+branchX). If a dev release is generated from a branch other than "master", the branch name will be used as the metadata, if <code>versionMetadata</code> is not supplied.
-                </p>
-
-                <p><em><strong>NOTE</strong>: metadata is only applied to Dev Releases.</em></p>
+                An optional dev release name to be appended to the version. This will be separated by a "." (e.g. with "branchX" as the dev release name. 3.0.0.dev.20151015T131223Z.039d221.branchX). When a dev release is generated from a branch other than "master", the branch name will automatically be used as the dev release name, if <code>devName</code> is not supplied.
             </td>
             <td>
                 ""

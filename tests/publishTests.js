@@ -287,7 +287,7 @@ var getDevVersionFixture = [{
     revisionCmd: "get revision",
     branchCmd: "get branch",
     devVersion: "${version}-${preRelease}.${timestamp}.${revision}",
-    versionMetadata: "",
+    devName: "",
     devTag: "test",
     moduleVersion: "1.2.3",
     expectedVersion: "1.2.3-test.20151015T131223Z.039d221",
@@ -299,10 +299,10 @@ var getDevVersionFixture = [{
     revisionCmd: "get revision",
     branchCmd: "get branch",
     devVersion: "${version}-${preRelease}.${timestamp}.${revision}",
-    versionMetadata: "master-metadata",
+    devName: "master-dev",
     devTag: "test",
     moduleVersion: "1.2.3",
-    expectedVersion: "1.2.3-test.20151015T131223Z.039d221+master-metadata",
+    expectedVersion: "1.2.3-test.20151015T131223Z.039d221.master-dev",
     returnedTimestamp: 1444914743,
     returnedRevision: "039d221",
     returnedBranch: "master"
@@ -311,10 +311,10 @@ var getDevVersionFixture = [{
     revisionCmd: "get revision",
     branchCmd: "get branch",
     devVersion: "${version}-${preRelease}.${timestamp}.${revision}",
-    versionMetadata: "",
+    devName: "",
     devTag: "test",
     moduleVersion: "1.2.3",
-    expectedVersion: "1.2.3-test.20151015T131223Z.039d221+fluid-xxxx",
+    expectedVersion: "1.2.3-test.20151015T131223Z.039d221.fluid-xxxx",
     returnedTimestamp: 1444914743,
     returnedRevision: "039d221",
     returnedBranch: "fluid-xxxx"
@@ -323,17 +323,17 @@ var getDevVersionFixture = [{
     revisionCmd: "get revision",
     branchCmd: "get branch",
     devVersion: "${version}-${preRelease}.${timestamp}.${revision}",
-    versionMetadata: "branch-metadata",
+    devName: "branch-dev",
     devTag: "test",
     moduleVersion: "1.2.3",
-    expectedVersion: "1.2.3-test.20151015T131223Z.039d221+branch-metadata",
+    expectedVersion: "1.2.3-test.20151015T131223Z.039d221.branch-dev",
     returnedTimestamp: 1444914743,
     returnedRevision: "039d221",
     returnedBranch: "fluid-xxxx"
 }];
 
 getDevVersionFixture.forEach(function (fixture) {
-    console.log("getDevVersion test - rawTimestampCmd: " + fixture.rawTimestampCmd + " revisionCmd: " + fixture.revisionCmd + " branch: " + fixture.returnedBranch + " devVersion: " + fixture.devVersion + " versionMetadata: " + fixture.versionMetadata);
+    console.log("getDevVersion test - rawTimestampCmd: " + fixture.rawTimestampCmd + " revisionCmd: " + fixture.revisionCmd + " branch: " + fixture.returnedBranch + " devVersion: " + fixture.devVersion + " devName: " + fixture.devName);
 
     var exec = sinon.stub(publish, "execSync");
     exec.onFirstCall().returns(fixture.returnedTimestamp);
@@ -499,7 +499,7 @@ var publishFixture = [{
         "vcTagCmd": "dry run vc tag",
         "pushVCTagCmd": "dry run push vc tag",
         "devVersion": "dry run ${version}-${preRelease}.${timestamp}.${revision}",
-        "versionMetadata": "dry run metadata",
+        "devName": "dry run devName",
         "devTag": "dry run dev",
         "remoteName": "dry run remote",
         "moduleRoot": __dirname,
@@ -526,7 +526,7 @@ var publishFixture = [{
         "vcTagCmd": "vc tag",
         "pushVCTagCmd": "push vc tag",
         "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
-        "versionMetadata": "metadata",
+        "devName": "devName",
         "devTag": "dev",
         "remoteName": "remote",
         "moduleRoot": __dirname,
@@ -553,7 +553,7 @@ publishFixture.forEach(function (fixture) {
     var toStub = ["checkChanges", "getDevVersion", "setVersion", "pubImpl", "clean"];
     var stub = createStubs(publish, toStub);
     var moduleVersion = modulePackage.version;
-    var devVersion = moduleVersion + "-testVersion+metadata";
+    var devVersion = moduleVersion + "-testVersion+devName";
 
     stub.getDevVersion.returns(devVersion);
 

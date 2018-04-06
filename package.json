@@ -53,7 +53,7 @@
     "vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'",
     "pushVCTagCmd": "git push ${remote} v${version}",
     "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
-    "versionMetadata": "",
+    "devName": "",
     "devTag": "dev",
     "remoteName": "upstream",
     "moduleRoot": "",

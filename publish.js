@@ -199,11 +199,11 @@ publish.setVersion = function (version, options) {
 
 /**
  * Calculates the current dev version of the package.
- * Will include version metadata if run on a branch other than master, or if
- * the versionMetadata option is provided.
+ * Will include dev version name if run on a branch other than master, or if
+ * the devName option is provided.
  *
  * @param moduleVersion {String} - The version of the module (e.g. X.x.x)
- * @param options {Object} - e.g. {"rawTimestampCmd": "git show -s --format=%ct HEAD", "revisionCmd": "git rev-parse --verify --short HEAD", "branchCmd": "git rev-parse --abbrev-ref HEAD", "devVersion": "${version}-${preRelease}.${timestamp}.${revision}", "versionMetadata": "", "devTag": "dev"}
+ * @param options {Object} - e.g. {"rawTimestampCmd": "git show -s --format=%ct HEAD", "revisionCmd": "git rev-parse --verify --short HEAD", "branchCmd": "git rev-parse --abbrev-ref HEAD", "devVersion": "${version}-${preRelease}.${timestamp}.${revision}", "devName": "", "devTag": "dev"}
  * @returns {String} - the current dev version number
  */
 publish.getDevVersion = function (moduleVersion, options) {
@@ -219,8 +219,8 @@ publish.getDevVersion = function (moduleVersion, options) {
         revision: revision
     });
 
-    if (branch !== "master" || options.versionMetadata) {
-        newStr = newStr + "+" + (options.versionMetadata || branch);
+    if (branch !== "master" || options.devName) {
+        newStr = newStr + "." + (options.devName || branch);
     }
 
     return newStr;
