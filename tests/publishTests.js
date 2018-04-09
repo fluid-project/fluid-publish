@@ -553,7 +553,7 @@ publishFixture.forEach(function (fixture) {
     var toStub = ["checkChanges", "getDevVersion", "setVersion", "pubImpl", "clean"];
     var stub = createStubs(publish, toStub);
     var moduleVersion = modulePackage.version;
-    var devVersion = moduleVersion + "-testVersion+devName";
+    var devVersion = moduleVersion + "-testVersion.devName";
 
     stub.getDevVersion.returns(devVersion);
 
