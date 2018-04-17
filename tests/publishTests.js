@@ -598,3 +598,46 @@ publishFixture.forEach(function (fixture) {
 
     removeStubs(publish, toStub);
 });
+
+var skipChanges = [{
+    isTest: false,
+    options: {
+        "changesCmd": "dry run get changes",
+        "rawTimestampCmd": "dry run get rawTimestamp",
+        "revisionCmd": "dry run get revision",
+        "packCmd": "dry run pack",
+        "checkChanges": false,
+        "publishCmd": "dry run publish",
+        "versionCmd": "dry run version",
+        "distTagCmd": "dry run set tag",
+        "cleanCmd": "dry run clean",
+        "vcTagCmd": "dry run vc tag",
+        "pushVCTagCmd": "dry run push vc tag",
+        "devVersion": "dry run ${version}-${preRelease}.${timestamp}.${revision}",
+        "devTag": "dry run dev",
+        "moduleRoot": __dirname
+    }
+}];
+
+// publish.skipcheckchanges
+console.log("\n*** publish.skipcheckchanges ***");
+
+skipChanges.forEach(function (fixture) {
+    // test check changes dev
+    var toStub = ["checkChanges", "getDevVersion", "setVersion", "pubImpl", "tag", "clean"];
+    var stub = createStubs(publish, toStub);
+
+    publish.dev(fixture.isTest, fixture.options);
+
+    assert(stub.checkChanges.notCalled, "checkChanges not should have been called");
+    removeStubs(publish, toStub);
+
+    // test check changes standard
+    var toStub = ["checkChanges", "tagVC", "pubImpl"];
+    var stub = createStubs(publish, toStub);
+
+    publish.standard(fixture.isTest, fixture.options);
+
+    assert(stub.checkChanges.notCalled, "checkChanges not should have been called");
+    removeStubs(publish, toStub);
+});
