@@ -29,14 +29,14 @@
   },
   "homepage": "http://fluidproject.org",
   "dependencies": {
-    "es6-template-strings": "2.0.0",
-    "extend": "3.0.0"
+    "es6-template-strings": "2.0.1",
+    "extend": "3.0.1"
   },
   "devDependencies": {
-    "grunt": "1.0.1",
-    "eslint-config-fluid": "1.0.0",
+    "grunt": "1.0.2",
+    "eslint-config-fluid": "1.2.0",
     "fluid-grunt-eslint": "18.1.2",
-    "grunt-jsonlint": "1.0.4",
+    "grunt-jsonlint": "1.1.0",
     "sinon": "1.17.1"
   },
   "defaultOptions": {
