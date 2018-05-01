@@ -1,6 +1,6 @@
 {
   "name": "fluid-publish",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A command line tool and node module that can be used to simplify the process of publishing a module to NPM. This is particularly useful for creating development releases, e.g. nightly or continuous integration releases.",
   "main": "publish.js",
   "engines": {
@@ -49,9 +49,9 @@
     "publishCmd": "npm publish",
     "publishDevCmd": "npm publish --tag ${devTag}",
     "versionCmd": "npm version --no-git-tag-version ${version}",
-    "checkFilesTracking": "git ls-files --error-unmatch ${filesToClean}",
-    "cleanCmd": "git checkout -- ${filesToClean}",
-    "filesToClean": "package.json package-lock.json",
+    "checkFileTracking": "git ls-files --error-unmatch ${file}",
+    "cleanCmd": "git checkout -- ${file}",
+    "filesToClean": "package.json, package-lock.json",
     "vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'",
     "pushVCTagCmd": "git push ${remote} v${version}",
     "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
@@ -63,7 +63,7 @@
     "checkRemoteHint": "Run \"git remote -v\" for a list of available remote repositories.\n",
     "publishHint": "Ensure that you have access to publish to the registry and that the current version does not already exist.\n",
     "publishDevHint": "Ensure that you have access to publish to the registry and that the current version does not already exist.\nIf the npm tag specified by --tag is recognizable as a valid semver version number, it will be rejected by npm. This is because version numbers and tags share a common namespace for npm packages.\n",
-    "checkFilesTrackingHint": "Either the file ${filesToClean} is not being tracked or does not exist.",
+    "checkFileTrackingHint": "${file} was not cleaned. It is either not being tracked or does not exist.",
     "vcTagHint": "If the tag already exists, run \"git tag -d v${version}\" to remove the existing tag.\n",
     "pushVCTagHint": "If the tag already exists, run \"git push ${remote} :refs/tags/v${version} to remove the existing tag.\n"
   }

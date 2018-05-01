@@ -243,13 +243,45 @@ publish.standard();
         </tr>
         <tr>
             <td>
+                <code>checkFileTracking</code>
+            </td>
+            <td>
+                The CLI to execute which checks if there are any temporary changes.
+                <ul>
+                    <li>
+                        <code>${file}</code> will be substituted with the name of the file to be checked.
+                    </li>
+                </ul>
+            </td>
+            <td>
+                "git ls-files --error-unmatch ${file}"
+            </td>
+        </tr>
+        <tr>
+            <td>
                 <code>cleanCmd</code>
             </td>
             <td>
-                The CLI to execute which cleans up any temporary changes to the package.json and package-lock.json files.
+                The CLI to execute which cleans up any temporary changes.
+                <ul>
+                    <li>
+                        <code>${file}</code> will be substituted with the name of the file to be cleaned.
+                    </li>
+                </ul>
             </td>
             <td>
-                "git checkout -- package.json package-lock.json"
+                "git checkout -- ${file}"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>filesToClean</code>
+            </td>
+            <td>
+                The names of files to be checked and cleaned after the test release.
+            </td>
+            <td>
+                "package.json, package-lock.json"
             </td>
         </tr>
         <tr>
@@ -381,6 +413,17 @@ publish.standard();
             </td>
             <td>
                 "Ensure that you have access to publish to the registry and that the current version does not already exist.\nIf the npm tag specified by --tag is recognizable as a valid semver version number, it will be rejected by npm. This is because version numbers and tags share a common namespace for npm packages.\n"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>checkFileTrackingHint</code>
+            </td>
+            <td>
+                A hint for addressing an issue where checking a file while tracking fails.
+            </td>
+            <td>
+                "${file} was not cleaned. It is either not being tracked or does not exist."
             </td>
         </tr>
         <tr>
