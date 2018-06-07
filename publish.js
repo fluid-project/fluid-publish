@@ -266,12 +266,14 @@ publish.tagVC = function (isTest, version, options) {
 };
 
 /**
- * Restore the package.json file to the latest committed version.
+ * Restore the files specified in filesToClean option to the latest committed version.
+ * Restores package.json and package-lock.json files to the latest commited version by default.
  *
- * Used internally to reset version number changes in package.json
- * @param moduleRoot {String} - the directory where the package.json file to
+ * Used internally to reset version number changes in list of files in filesToClean option.
+ * First checks whether the list of files in filesToClean option are being tracked by git or not.
+ * @param moduleRoot {String} - the directory where the files to
                                 clean is located in.
- * @param options {Object} - e.g. {"cleanCmd": "git checkout -- package.json"}
+ * @param options {Object} - e.g. {"checkFileTracking": "git ls-files --error-unmatch ${file}", "cleanCmd": "git checkout -- ${file}", "filesToClean": "package.json, package-lock.json"}
  */
 publish.clean = function (moduleRoot, options) {
     var originalDir = process.cwd();
@@ -279,8 +281,22 @@ publish.clean = function (moduleRoot, options) {
     // change to the module root directory
     process.chdir(moduleRoot || "./");
 
-    // run the clean command
-    publish.execSyncFromTemplate(options.cleanCmd);
+    var file = options.filesToClean.split(/\s*,\s*/);
+
+    file.forEach(function (file) {
+
+        // check whether file is being tracked or not and then try to clean it
+        try {
+            publish.execSyncFromTemplate(options.checkFileTracking, {
+                file: file
+            }, options.checkFileTrackingHint);
+            publish.execSyncFromTemplate(options.cleanCmd, {
+                file: file
+            });
+        } catch (error) {
+            publish.log(error.message);
+        }
+    });
 
     // restore the working directory
     process.chdir(originalDir);

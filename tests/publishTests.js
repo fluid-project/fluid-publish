@@ -431,7 +431,9 @@ console.log("\n*** publish.clean ***");
 
 var cleanFixture = [{
     moduleRoot: "./",
-    cleanCmd: "clean"
+    checkFileTracking: "checkFileTracking",
+    cleanCmd: "clean",
+    filesToClean: "package.json, package-lock.json"
 }];
 
 cleanFixture.forEach(function (fixture) {
