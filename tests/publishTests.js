@@ -285,67 +285,26 @@ console.log("\n*** publish.getDevVersion ***");
 var getDevVersionFixture = [{
     rawTimestampCmd: "get raw timestamp",
     revisionCmd: "get revision",
-    branchCmd: "get branch",
     devVersion: "${version}-${preRelease}.${timestamp}.${revision}",
-    devName: "",
     devTag: "test",
     moduleVersion: "1.2.3",
     expectedVersion: "1.2.3-test.20151015T131223Z.039d221",
     returnedTimestamp: 1444914743,
-    returnedRevision: "039d221",
-    returnedBranch: "master"
-}, {
-    rawTimestampCmd: "get raw timestamp",
-    revisionCmd: "get revision",
-    branchCmd: "get branch",
-    devVersion: "${version}-${preRelease}.${timestamp}.${revision}",
-    devName: "master-dev",
-    devTag: "test",
-    moduleVersion: "1.2.3",
-    expectedVersion: "1.2.3-test.20151015T131223Z.039d221.master-dev",
-    returnedTimestamp: 1444914743,
-    returnedRevision: "039d221",
-    returnedBranch: "master"
-}, {
-    rawTimestampCmd: "get raw timestamp",
-    revisionCmd: "get revision",
-    branchCmd: "get branch",
-    devVersion: "${version}-${preRelease}.${timestamp}.${revision}",
-    devName: "",
-    devTag: "test",
-    moduleVersion: "1.2.3",
-    expectedVersion: "1.2.3-test.20151015T131223Z.039d221.fluid-xxxx",
-    returnedTimestamp: 1444914743,
-    returnedRevision: "039d221",
-    returnedBranch: "fluid-xxxx"
-}, {
-    rawTimestampCmd: "get raw timestamp",
-    revisionCmd: "get revision",
-    branchCmd: "get branch",
-    devVersion: "${version}-${preRelease}.${timestamp}.${revision}",
-    devName: "branch-dev",
-    devTag: "test",
-    moduleVersion: "1.2.3",
-    expectedVersion: "1.2.3-test.20151015T131223Z.039d221.branch-dev",
-    returnedTimestamp: 1444914743,
-    returnedRevision: "039d221",
-    returnedBranch: "fluid-xxxx"
+    returnedRevision: "039d221"
 }];
 
 getDevVersionFixture.forEach(function (fixture) {
-    console.log("getDevVersion test - rawTimestampCmd: " + fixture.rawTimestampCmd + " revisionCmd: " + fixture.revisionCmd + " branch: " + fixture.returnedBranch + " devVersion: " + fixture.devVersion + " devName: " + fixture.devName);
+    console.log("getDevVersion test - rawTimestampCmd: " + fixture.rawTimestampCmd + " revisionCmd: " + fixture.revisionCmd + " devVersion: " + fixture.devVersion);
 
     var exec = sinon.stub(publish, "execSync");
     exec.onFirstCall().returns(fixture.returnedTimestamp);
     exec.onSecondCall().returns(fixture.returnedRevision);
-    exec.onThirdCall().returns(fixture.returnedBranch);
 
     var result = publish.getDevVersion(fixture.moduleVersion, fixture);
 
-    assert.equal(exec.callCount, 3, "execSync should have been called three times");
-    assert(exec.getCall(0).calledWith(fixture.rawTimestampCmd), "first execSync should have been called with: " + fixture.rawTimestampCmd);
-    assert(exec.getCall(1).calledWith(fixture.revisionCmd), "second execSync should have been called with: " + fixture.revisionCmd);
-    assert(exec.getCall(2).calledWith(fixture.branchCmd), "third execSync should have been called with: " + fixture.branchCmd);
+    assert(exec.calledTwice, "execSync should have been called twice");
+    assert(exec.calledWith(fixture.rawTimestampCmd), "first execSync should have been called with: " + fixture.rawTimestampCmd);
+    assert(exec.calledWith(fixture.revisionCmd), "second execSync should have been called with: " + fixture.revisionCmd);
     assert.equal(result, fixture.expectedVersion, "Expected version: " + fixture.expectedVersion + " actual: " + result);
 
     // remove execSync stub
@@ -431,7 +390,9 @@ console.log("\n*** publish.clean ***");
 
 var cleanFixture = [{
     moduleRoot: "./",
-    cleanCmd: "clean"
+    checkFileTracking: "checkFileTracking",
+    cleanCmd: "clean",
+    filesToClean: "package.json, package-lock.json"
 }];
 
 cleanFixture.forEach(function (fixture) {
@@ -490,7 +451,6 @@ var publishFixture = [{
         "checkRemoteCmd": "dry run check remote",
         "rawTimestampCmd": "dry run get rawTimestamp",
         "revisionCmd": "dry run get revision",
-        "branchCmd": "dry run get branch",
         "packCmd": "dry run pack",
         "publishCmd": "dry run publish",
         "publishDevCmd": "dry run npm publish dev",
@@ -499,7 +459,6 @@ var publishFixture = [{
         "vcTagCmd": "dry run vc tag",
         "pushVCTagCmd": "dry run push vc tag",
         "devVersion": "dry run ${version}-${preRelease}.${timestamp}.${revision}",
-        "devName": "dry run devName",
         "devTag": "dry run dev",
         "remoteName": "dry run remote",
         "moduleRoot": __dirname,
@@ -517,7 +476,6 @@ var publishFixture = [{
         "checkRemoteCmd": "check remote",
         "rawTimestampCmd": "get rawTimestamp",
         "revisionCmd": "get revision",
-        "branchCmd": "get branch",
         "packCmd": "pack",
         "publishCmd": "publish",
         "publishDevCmd": "publish dev",
@@ -526,7 +484,6 @@ var publishFixture = [{
         "vcTagCmd": "vc tag",
         "pushVCTagCmd": "push vc tag",
         "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
-        "devName": "devName",
         "devTag": "dev",
         "remoteName": "remote",
         "moduleRoot": __dirname,
@@ -553,7 +510,7 @@ publishFixture.forEach(function (fixture) {
     var toStub = ["checkChanges", "getDevVersion", "setVersion", "pubImpl", "clean"];
     var stub = createStubs(publish, toStub);
     var moduleVersion = modulePackage.version;
-    var devVersion = moduleVersion + "-testVersion.devName";
+    var devVersion = moduleVersion + "-testVersion";
 
     stub.getDevVersion.returns(devVersion);
 

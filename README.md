@@ -246,7 +246,7 @@ publish.standard();
                 <code>checkFileTracking</code>
             </td>
             <td>
-                The CLI to execute which checks if there are any temporary changes.
+                The CLI to execute which checks for any temporary changes made while publishing.
                 <ul>
                     <li>
                         <code>${file}</code> will be substituted with the name of the file to be checked.
@@ -262,7 +262,7 @@ publish.standard();
                 <code>cleanCmd</code>
             </td>
             <td>
-                The CLI to execute which cleans up any temporary changes.
+                The CLI to execute which cleans up any temporary changes made while publishing.
                 <ul>
                     <li>
                         <code>${file}</code> will be substituted with the name of the file to be cleaned.
@@ -278,7 +278,7 @@ publish.standard();
                 <code>filesToClean</code>
             </td>
             <td>
-                The names of files to be checked and cleaned after the test release.
+                A comma-seperated list of names of files to be checked and cleaned after the test release.
             </td>
             <td>
                 "package.json, package-lock.json"

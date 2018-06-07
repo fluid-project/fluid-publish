@@ -271,7 +271,7 @@ publish.tagVC = function (isTest, version, options) {
  *
  * Used internally to reset version number changes in list of files in filesToClean option.
  * First checks whether the list of files in filesToClean option are being tracked by git or not.
- * @param moduleRoot {String} - the directory where the files to 
+ * @param moduleRoot {String} - the directory where the files to
                                 clean is located in.
  * @param options {Object} - e.g. {"checkFileTracking": "git ls-files --error-unmatch ${file}", "cleanCmd": "git checkout -- ${file}", "filesToClean": "package.json, package-lock.json"}
  */
@@ -283,7 +283,7 @@ publish.clean = function (moduleRoot, options) {
 
     var file = options.filesToClean.split(/\s*,\s*/);
 
-    file.forEach(function(file){
+    file.forEach(function (file) {
 
         // check whether file is being tracked or not and then try to clean it
         try {
@@ -297,7 +297,7 @@ publish.clean = function (moduleRoot, options) {
             publish.log(error.message);
         }
     });
-    
+
     // restore the working directory
     process.chdir(originalDir);
 };
