@@ -68,6 +68,17 @@ fluid-publish
 fluid-publish --standard
 ```
 
+#### --otp ####
+
+__value__: (String)
+
+Specifies the one-time password to use. This is required if the NPM account has two-factor authentication enabled.
+
+```bash
+# publishes to NPM and authenticating with a one-time password
+fluid-publish --otp=12345
+```
+
 #### options #####
 
 Optional key/value pairs, in the form `key=value`, to override the default configuration used across the publish script. The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key.
@@ -184,6 +195,39 @@ publish.standard();
             </td>
             <td>
                 "git rev-parse --abbrev-ref HEAD"
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>otp</code>
+            </td>
+            <td>
+                A one-time password for NPM two-factor authentication.
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <code>otpFlag</code>
+            </td>
+            <td>
+                Applies the otp flag to the CLI to execute a publish command. This is needed if the NPM account uses two-factor authentication and will only be applied if the otp option is set.
+                <ul>
+                    <li>
+                        <code>${command}</code> will be substituted with the command being executed. Either <code>publichCmd</code> or <code>publishDevCmd</code>
+                    </li>
+                    <li>
+                        <code>${otp}</code> will be substituted with the one-time password provided.
+                    </li>
+                </ul>
+            </td>
+            <td>
+                "${command} --otp=${otp}"
+                <br>
+                <br>
+                <p>
+                    <em><strong>NOTE</strong>: This is only required when two-factor authentication is enabled and will only be applied when a one-time password is provided.</em>
+                </p>
             </td>
         </tr>
         <tr>

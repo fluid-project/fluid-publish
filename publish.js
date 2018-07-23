@@ -232,7 +232,7 @@ publish.getDevVersion = function (moduleVersion, options) {
  *
  * @param isTest {Boolean} - indicates if this is a test run or not
  * @param isDev {Boolean} - indicates if this is a development (true) or standard (false) release
- * @param options {Object} - e.g. {"packCmd": "npm pack", "publishCmd": "npm publish", "publishDevCmd": "npm publish --tag", "publishHint": "publish hint", "publishDevHint": "publish dev hint", devTag: "dev"}
+ * @param options {Object} - e.g. {"packCmd": "npm pack", "publishCmd": "npm publish", "publishDevCmd": "npm publish --tag", "publishHint": "publish hint", "publishDevHint": "publish dev hint", devTag: "dev", "otpFlag": "${command}--otp=${otp}", otp=123456}
  */
 publish.pubImpl = function (isTest, isDev, options) {
     if (isTest) {
@@ -242,6 +242,11 @@ publish.pubImpl = function (isTest, isDev, options) {
         // publish to npm
         var pubCmd = isDev ? options.publishDevCmd : options.publishCmd;
         var pubHint = isDev ? options.publishDevHint : options.publishHint;
+
+        if (options.otp) {
+            pubCmd = es6Template(options.otpFlag, {command: pubCmd, otp: options.otp});
+        }
+
         publish.execSyncFromTemplate(pubCmd, options, pubHint);
     }
 };
