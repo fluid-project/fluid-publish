@@ -373,6 +373,9 @@ if (require.main === module) {
     var opts = publish.getCLIOpts();
     var isTest = opts["--test"];
 
+    // allow to use the more standard "--otp" form to provide the one-time password
+    opts.otp = opts.otp || opts["--otp"];
+
     if (opts["--version"]) {
         publish.getPublishPkgVersion();
     } else if (opts["--standard"]) {
