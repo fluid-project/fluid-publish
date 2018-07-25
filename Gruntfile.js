@@ -21,8 +21,8 @@ module.exports = function (grunt) {
             sources: {
                 md: [ "**/*.md", "!node_modules/**/*.md"],
                 js: ["**/*.js"],
-                json: ["*.json", ".*.json", "tests/*.json", "!./package-lock.json"],
-                other: ["./.*", "!node_modules/**/*.*", "!./**/.DS_Store", "!./package-lock.json"]
+                json: ["*.json", ".*.json", "tests/*.json", "!package-lock.json"],
+                other: ["./.*", "!node_modules/**/*.*", "!./**/.DS_Store"]
             }
         }
     });
