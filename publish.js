@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 /*
-Copyright 2015-2016 OCAD University
+Copyright 2015-2018 OCAD University
 
 Licensed under the New BSD license. You may not use this file except in
 compliance with this License.
@@ -33,10 +33,10 @@ publish.log = console.log;
 /**
  * Returns the contents of a package.json file as JSON object
  *
- * @param moduleRoot {String} - the path to the root where the package.json is
+ * @param {String} moduleRoot - the path to the root where the package.json is
  *                              located. Will use process.cwd() by default.
- * @returns {Object} - returns the contents of the package.json file as a JSON
- *                     object.
+ * @return {Object} - returns the contents of the package.json file as a JSON
+ *                    object.
  */
 publish.getPkg = function (moduleRoot) {
     moduleRoot = moduleRoot || process.cwd();
@@ -52,7 +52,7 @@ publish.getPkg = function (moduleRoot) {
  *
  * see: https://nodejs.org/docs/latest/api/process.html#process_process_argv
  *
- * @returns {Object} - the CLI arguments as an options object
+ * @return {Object} - the CLI arguments as an options object
  */
 publish.getCLIOpts = function () {
     var opts = {};
@@ -77,10 +77,10 @@ publish.getCLIOpts = function () {
 /**
  * Creates a number with 0's padded on the left
  *
- * @param num {Number}
- * @param width {Number} - the min-width of the number (default is 2),
- *                        if the number is shorter it will be padded with zeros on the left.
- * @returns {String} - a string representation of the number with padding as needed
+ * @param {Number} num - the number to padd with 0s
+ * @param {Number} width - the min-width of the number (default is 2),
+ *                         if the number is shorter it will be padded with zeros on the left.
+ * @return {String} - a string representation of the number with padding as needed
  */
 publish.padZeros = function (num, width) {
     width = width || 2;
@@ -96,8 +96,8 @@ publish.padZeros = function (num, width) {
 /**
  * Creates a date object from a git timestamp
  *
- * @param timestamp {String} - timestamp in seconds as returned by "git show -s --format=%ct HEAD"
- * @returns {Object} - an object of date properties
+ * @param {String} timestamp - timestamp in seconds as returned by "git show -s --format=%ct HEAD"
+ * @return {Object} - an object of date properties
  */
 publish.fromTimestamp = function (timestamp) {
     var timestampInMS = Number(timestamp) * 1000;
@@ -117,8 +117,8 @@ publish.fromTimestamp = function (timestamp) {
  * Converts a git timestamp into a particular profile of ISO8601 timestamp,
  * with the format yyyymmddThhmmssZ
  *
- * @param timestamp {String} - timestamp in seconds as returned by "git show -s --format=%ct HEAD"
- * @returns {String} - the time in the ISO8601 format yyyymmddThhmmssZ
+ * @param {String} timestamp - timestamp in seconds as returned by "git show -s --format=%ct HEAD"
+ * @return {String} - the time in the ISO8601 format yyyymmddThhmmssZ
  */
 publish.convertToISO8601 = function (timestamp) {
     var date = publish.fromTimestamp(timestamp);
@@ -134,14 +134,17 @@ publish.convertToISO8601 = function (timestamp) {
  * Calls publish.execSync with a command crafted from a template string.
  * If it is a test run, the command will only be logged to the console.
  *
- * @param cmdTemplate {String} - A string template of the command to execute.
+ * @param {String} cmdTemplate - A string template of the command to execute.
  *                               Can provide tokens in the form ${tokenName}
- * @param values {Object} - the tokens and their replacement.
+ * @param {Object} cmdValues - the tokens and their replacement.
  *                          e.g. {tokenName: "value to insert"}
- * @param hint {String} - A string template of a hint for recovering from an error thrown by the executed command.
- *                               Can provide tokens in the form ${tokenName}
- * @param isTest {Boolean} - indicates if this is a test run or not. If it is
+ * @param {String} hint - A string template of a hint for recovering from an error thrown by the executed command.
+ *                        Can provide tokens in the form ${tokenName}
+ * @param {Boolean} isTest - indicates if this is a test run or not. If it is
  *                           a test run, the command will be logged but not executed.
+ *
+ * @return {Buffer|String} - the stdout from the command.
+ * @throws {Error} - will contain the entire result from node's child_process.spawnSync()
  */
 publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, hint, isTest) {
     var cmdStr = es6Template(cmdTemplate, cmdValues);
@@ -161,8 +164,8 @@ publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, hint, isTest) {
 /**
  * Throws an error if there are any uncommitted changes
  *
- * @param options {Object} - e.g. {"changesCmd": "git status -s -uno", "changesHint": "change hint"}
- * @throws Error - An error object with a message containing a list of uncommitted changes.
+ * @param {Object} options - e.g. {"changesCmd": "git status -s -uno", "changesHint": "change hint"}
+ * @throws {Error} - An error object with a message containing a list of uncommitted changes.
  */
 publish.checkChanges = function (options) {
     var changes = publish.execSyncFromTemplate(options.changesCmd);
@@ -176,7 +179,11 @@ publish.checkChanges = function (options) {
 /**
  * Checks that the remote exists. If it does not exist an error is thrown.
  *
- * @param options {Object} - e.g. {"checkRemoteCmd": "git ls-remote --exit-code ${remote}", "remoteName": "upstream", "checkRemoteHint": "check remote hint"}
+ * @param {Object} options - e.g. {
+ *                                    "checkRemoteCmd": "git ls-remote --exit-code ${remote}",
+ *                                    "remoteName": "upstream",
+ *                                    "checkRemoteHint": "check remote hint"
+ *                                }
  */
 publish.checkRemote = function (options) {
     publish.execSyncFromTemplate(options.checkRemoteCmd, {
@@ -188,8 +195,8 @@ publish.checkRemote = function (options) {
  * Updates the package.json version to the specified version
  * This does not commit the change, it will only modify the file.
  *
- * @param version {String} - the version to set in the package.json file
- * @param options {Object} - e.g. {"versionCmd": "npm version --no-git-tag-version ${version}"}
+ * @param {String} version - the version to set in the package.json file
+ * @param {Object} options - e.g. {"versionCmd": "npm version --no-git-tag-version ${version}"}
  */
 publish.setVersion = function (version, options) {
     publish.execSyncFromTemplate(options.versionCmd, {
@@ -202,9 +209,16 @@ publish.setVersion = function (version, options) {
  * Will include dev version name if run on a branch other than master, or if
  * the devName option is provided.
  *
- * @param moduleVersion {String} - The version of the module (e.g. X.x.x)
- * @param options {Object} - e.g. {"rawTimestampCmd": "git show -s --format=%ct HEAD", "revisionCmd": "git rev-parse --verify --short HEAD", "branchCmd": "git rev-parse --abbrev-ref HEAD", "devVersion": "${version}-${preRelease}.${timestamp}.${revision}", "devName": "", "devTag": "dev"}
- * @returns {String} - the current dev version number
+ * @param {String} moduleVersion - The version of the module (e.g. X.x.x)
+ * @param {Object} options - e.g. {
+ *                                    "rawTimestampCmd": "git show -s --format=%ct HEAD",
+ *                                    "revisionCmd": "git rev-parse --verify --short HEAD",
+ *                                    "branchCmd": "git rev-parse --abbrev-ref HEAD",
+ *                                    "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
+ *                                    "devName": "",
+ *                                    "devTag": "dev"
+ *                                }
+ * @return {String} - the current dev version number
  */
 publish.getDevVersion = function (moduleVersion, options) {
     var rawTimestamp = publish.execSyncFromTemplate(options.rawTimestampCmd);
@@ -230,9 +244,18 @@ publish.getDevVersion = function (moduleVersion, options) {
  * Publishes the module to npm using the current version number in pacakge.json.
  * If isTest is specified, it will instead create a tarball in the local directory.
  *
- * @param isTest {Boolean} - indicates if this is a test run or not
- * @param isDev {Boolean} - indicates if this is a development (true) or standard (false) release
- * @param options {Object} - e.g. {"packCmd": "npm pack", "publishCmd": "npm publish", "publishDevCmd": "npm publish --tag", "publishHint": "publish hint", "publishDevHint": "publish dev hint", devTag: "dev"}
+ * @param {Boolean} isTest - indicates if this is a test run or not
+ * @param {Boolean} isDev - indicates if this is a development (true) or standard (false) release
+ * @param {Object} options - e.g. {
+ *                                    "packCmd": "npm pack",
+ *                                    "publishCmd": "npm publish",
+ *                                    "publishDevCmd": "npm publish --tag",
+ *                                    "publishHint": "publish hint",
+ *                                    "publishDevHint": "publish dev hint",
+ *                                    "devTag": "dev",
+ *                                    "otpFlag": "${command} --otp=${otp}",
+ *                                    "otp"=123456
+ *                                }
  */
 publish.pubImpl = function (isTest, isDev, options) {
     if (isTest) {
@@ -242,6 +265,11 @@ publish.pubImpl = function (isTest, isDev, options) {
         // publish to npm
         var pubCmd = isDev ? options.publishDevCmd : options.publishCmd;
         var pubHint = isDev ? options.publishDevHint : options.publishHint;
+
+        if (options.otp) {
+            pubCmd = es6Template(options.otpFlag, {command: pubCmd, otp: options.otp});
+        }
+
         publish.execSyncFromTemplate(pubCmd, options, pubHint);
     }
 };
@@ -249,9 +277,15 @@ publish.pubImpl = function (isTest, isDev, options) {
 /**
  * Applies a version control tag to the latest commit
  *
- * @param isTest {Boolean} - indicates if this is a test run or not
- * @param version {String} - a string indicating the version
- * @param options {Object} - e.g. {"vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'", "pushVCTagCmd": "git push ${remote} v${version}", "remoteName": "upstream", "vcTagHint": "vc tag hint", "pushVCTagHint": "push vc tag hint"}
+ * @param {Boolean} isTest - indicates if this is a test run or not
+ * @param {String} version - a string indicating the version
+ * @param {Object} options - e.g. {
+ *                                    "vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'",
+ *                                    "pushVCTagCmd": "git push ${remote} v${version}",
+ *                                    "remoteName": "upstream",
+ *                                    "vcTagHint": "vc tag hint",
+ *                                    "pushVCTagHint": "push vc tag hint"
+ *                                }
  */
 publish.tagVC = function (isTest, version, options) {
     publish.execSyncFromTemplate(options.vcTagCmd, {
@@ -269,9 +303,9 @@ publish.tagVC = function (isTest, version, options) {
  * Restore the package.json file to the latest committed version.
  *
  * Used internally to reset version number changes in package.json
- * @param moduleRoot {String} - the directory where the package.json file to
+ * @param {String} moduleRoot - the directory where the package.json file to
                                 clean is located in.
- * @param options {Object} - e.g. {"cleanCmd": "git checkout -- package.json"}
+ * @param {Object} options - e.g. {"cleanCmd": "git checkout -- package.json"}
  */
 publish.clean = function (moduleRoot, options) {
     var originalDir = process.cwd();
@@ -301,8 +335,8 @@ publish.getPublishPkgVersion = function () {
  * devTag option (also applied as a tag to the release), and the build id
  * (yyyymmddThhmmssZ.shortHash) is generated based on the latest commit.
  *
- * @param isTest {Boolean} - indicates if this is a test run
- * @param options {Object} - see defaultOptions in package.json for possible values
+ * @param {Boolean} isTest - indicates if this is a test run
+ * @param {Object} options - see defaultOptions in package.json for possible values
  */
 publish.dev = function (isTest, options) {
     var publishPkg = publish.getPkg(__dirname);
@@ -337,8 +371,8 @@ publish.dev = function (isTest, options) {
  * However, it will create a tag and publish this tag to the version control
  * system.
  *
- * @param isTest {Boolean} - indicates if this is a test run
- * @param options {Object} - see defaultOptions in package.json for possible values
+ * @param {Boolean} isTest - indicates if this is a test run
+ * @param {Object} options - see defaultOptions in package.json for possible values
  */
 publish.standard = function (isTest, options) {
     var publishPkg = publish.getPkg(__dirname);
@@ -361,12 +395,16 @@ publish.standard = function (isTest, options) {
     publish.pubImpl(isTest, false, opts);
 };
 
+
 module.exports = publish;
 
 if (require.main === module) {
 
     var opts = publish.getCLIOpts();
     var isTest = opts["--test"];
+
+    // allow to use the more standard "--otp" form to provide the one-time password
+    opts.otp = opts.otp || opts["--otp"];
 
     if (opts["--version"]) {
         publish.getPublishPkgVersion();

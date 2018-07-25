@@ -25,3 +25,6 @@ build/Release
 # Dependency directory
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
+
+# Package lock file (useful in npm artefacts but not in git - https://pad.gpii.net/p/arch-2018-06-06-ve84n05 )
+package-lock.json

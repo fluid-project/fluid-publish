@@ -364,61 +364,77 @@ var pubImplFixture = [{
     isTest: true,
     isDev: false,
     packCmd: "pack",
-    publishCmd: "shouldn't publish",
-    publishDevCmd: "shouldn't publish dev"
+    expected: "pack"
 }, {
     isTest: false,
     isDev: false,
-    packCmd: "shouldn't pack",
     publishCmd: "publish",
-    publishDevCmd: "shouldn't publish dev"
+    expected: "publish"
 }, {
     isDev: false,
-    packCmd: "shouldn't pack",
     publishCmd: "publish",
-    publishDevCmd: "shouldn't publish dev"
+    expected: "publish"
 }, {
     isDev: true,
-    packCmd: "shouldn't pack",
-    publishCmd: "shouldn't publish",
-    publishDevCmd: "publish dev"
+    publishDevCmd: "publish dev",
+    expected: "publish dev"
 }, {
     isTest: false,
     isDev: true,
-    packCmd: "pack",
-    publishCmd: "shouldn't publish",
-    publishDevCmd: "publish dev"
+    publishDevCmd: "publish dev",
+    expected: "publish dev"
 }, {
     isTest: true,
     isDev: true,
     packCmd: "pack",
-    publishCmd: "shouldn't publish",
-    publishDevCmd: "shouldn't publish dev"
+    expected: "pack"
 }, {
     isTest: false,
-    packCmd: "shouldn't pack",
     publishCmd: "publish",
-    publishDevCmd: "shouldn't publish dev"
+    expected: "publish"
 }, {
     isTest: true,
     packCmd: "pack",
-    publishCmd: "shouldn't publish",
-    publishDevCmd: "shouldn't publish dev"
+    expected: "pack"
 }, {
-    packCmd: "shouldn't pack",
     publishCmd: "publish",
-    publishDevCmd: "shouldn't publish dev"
+    expected: "publish"
+}, {
+    isTest: false,
+    otp: "123456",
+    otpFlag: "${command} --otp=${otp}",
+    publishCmd: "publish",
+    expected: "publish --otp=123456"
+}, {
+    isTest: true,
+    otp: "123456",
+    otpFlag: "${command} --otp=${otp}",
+    packCmd: "pack",
+    expected: "pack"
+}, {
+    isTest: false,
+    isDev: true,
+    otp: "123456",
+    otpFlag: "${command} --otp=${otp}",
+    publishDevCmd: "publish dev",
+    expected: "publish dev --otp=123456"
+}, {
+    isTest: true,
+    isDev: true,
+    otp: "123456",
+    otpFlag: "${command} --otp=${otp}",
+    packCmd: "pack",
+    expected: "pack"
 }];
 
 pubImplFixture.forEach(function (fixture) {
     console.log("pubImpl test - isTest: " + fixture.isTest + "isDev: " + fixture.isDev + " packCmd: " + fixture.packCmd + " publishCmd: " + fixture.publishCmd + " publishDevCmd: " + fixture.publishDevCmd);
 
     var exec = sinon.stub(publish, "execSync");
-    var expected = fixture.isTest ? fixture.packCmd : fixture[fixture.isDev ? "publishDevCmd" : "publishCmd"];
 
     publish.pubImpl(fixture.isTest, fixture.isDev, fixture);
     assert(exec.calledOnce, "execSync should have been called");
-    assert(exec.calledWith(expected), "execSync should have been called with: " + expected);
+    assert(exec.calledWith(fixture.expected), "execSync should have been called with: " + fixture.expected);
 
     // remove execSync stub
     publish.execSync.restore();
@@ -491,6 +507,7 @@ var publishFixture = [{
         "rawTimestampCmd": "dry run get rawTimestamp",
         "revisionCmd": "dry run get revision",
         "branchCmd": "dry run get branch",
+        "otpFlag": "dry run ${command} --otp=${otp}",
         "packCmd": "dry run pack",
         "publishCmd": "dry run publish",
         "publishDevCmd": "dry run npm publish dev",
@@ -518,6 +535,7 @@ var publishFixture = [{
         "rawTimestampCmd": "get rawTimestamp",
         "revisionCmd": "get revision",
         "branchCmd": "get branch",
+        "otpFlag": "${command} --otp=${otp}",
         "packCmd": "pack",
         "publishCmd": "publish",
         "publishDevCmd": "publish dev",

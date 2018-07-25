@@ -1,67 +1,67 @@
 {
-  "name": "fluid-publish",
-  "version": "2.1.0",
-  "description": "A command line tool and node module that can be used to simplify the process of publishing a module to NPM. This is particularly useful for creating development releases, e.g. nightly or continuous integration releases.",
-  "main": "publish.js",
-  "engines": {
-    "node": ">=4.0.0"
-  },
-  "scripts": {
-    "pub": "node publish.js",
-    "test": "node tests/publishTests.js"
-  },
-  "bin": "./publish.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/fluid-project/fluid-publish.git"
-  },
-  "keywords": [
-    "npm",
-    "publish",
-    "node",
-    "module",
-    "CLI"
-  ],
-  "author": "Fluid Project",
-  "license": "BSD-3-Clause",
-  "bugs": {
-    "url": "https://issues.fluidproject.org/issues/?jql=project%20%3D%20FLUID%20AND%20component%20%3D%20%22Build%20Scripts%22"
-  },
-  "homepage": "http://fluidproject.org",
-  "dependencies": {
-    "es6-template-strings": "2.0.1",
-    "extend": "3.0.1"
-  },
-  "devDependencies": {
-    "grunt": "1.0.2",
-    "eslint-config-fluid": "1.2.0",
-    "fluid-grunt-eslint": "18.1.2",
-    "grunt-jsonlint": "1.1.0",
-    "sinon": "1.17.1"
-  },
-  "defaultOptions": {
-    "changesCmd": "git status -s -uno",
-    "checkRemoteCmd": "git ls-remote --exit-code ${remote}",
-    "rawTimestampCmd": "git show -s --format=%ct HEAD",
-    "revisionCmd": "git rev-parse --verify --short HEAD",
-    "branchCmd": "git rev-parse --abbrev-ref HEAD",
-    "packCmd": "npm pack",
-    "publishCmd": "npm publish",
-    "publishDevCmd": "npm publish --tag ${devTag}",
-    "versionCmd": "npm version --no-git-tag-version ${version}",
-    "cleanCmd": "git checkout -- package.json",
-    "vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'",
-    "pushVCTagCmd": "git push ${remote} v${version}",
-    "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
-    "devName": "",
-    "devTag": "dev",
-    "remoteName": "upstream",
-    "moduleRoot": "",
-    "changesHint": "Address uncommitted changes: Commit \"git commit -a\", Stash \"git stash\" or Clean \"git reset --hard\"\n",
-    "checkRemoteHint": "Run \"git remote -v\" for a list of available remote repositories.\n",
-    "publishHint": "Ensure that you have access to publish to the registry and that the current version does not already exist.\n",
-    "publishDevHint": "Ensure that you have access to publish to the registry and that the current version does not already exist.\nIf the npm tag specified by --tag is recognizable as a valid semver version number, it will be rejected by npm. This is because version numbers and tags share a common namespace for npm packages.\n",
-    "vcTagHint": "If the tag already exists, run \"git tag -d v${version}\" to remove the existing tag.\n",
-    "pushVCTagHint": "If the tag already exists, run \"git push ${remote} :refs/tags/v${version} to remove the existing tag.\n"
-  }
+    "name": "fluid-publish",
+    "version": "2.2.0",
+    "description": "A command line tool and node module that can be used to simplify the process of publishing a module to NPM. This is particularly useful for creating development releases, e.g. nightly or continuous integration releases.",
+    "main": "publish.js",
+    "engines": {
+        "node": ">=4.0.0"
+    },
+    "scripts": {
+        "pub": "node publish.js",
+        "test": "node tests/publishTests.js"
+    },
+    "bin": "./publish.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/fluid-project/fluid-publish.git"
+    },
+    "keywords": [
+        "npm",
+        "publish",
+        "node",
+        "module",
+        "CLI"
+    ],
+    "author": "Fluid Project",
+    "license": "BSD-3-Clause",
+    "bugs": {
+        "url": "https://issues.fluidproject.org/issues/?jql=project%20%3D%20FLUID%20AND%20component%20%3D%20%22Build%20Scripts%22"
+    },
+    "homepage": "http://fluidproject.org",
+    "dependencies": {
+        "es6-template-strings": "2.0.1",
+        "extend": "3.0.1"
+    },
+    "devDependencies": {
+        "eslint-config-fluid": "1.3.0",
+        "gpii-grunt-lint-all": "1.0.0",
+        "grunt": "1.0.2",
+        "sinon": "6.1.4"
+    },
+    "defaultOptions": {
+        "changesCmd": "git status -s -uno",
+        "checkRemoteCmd": "git ls-remote --exit-code ${remote}",
+        "rawTimestampCmd": "git show -s --format=%ct HEAD",
+        "revisionCmd": "git rev-parse --verify --short HEAD",
+        "branchCmd": "git rev-parse --abbrev-ref HEAD",
+        "otpFlag": "${command} --otp=${otp}",
+        "packCmd": "npm pack",
+        "publishCmd": "npm publish",
+        "publishDevCmd": "npm publish --tag ${devTag}",
+        "versionCmd": "npm version --no-git-tag-version ${version}",
+        "cleanCmd": "git checkout -- package.json",
+        "vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'",
+        "pushVCTagCmd": "git push ${remote} v${version}",
+        "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
+        "devName": "",
+        "devTag": "dev",
+        "remoteName": "upstream",
+        "moduleRoot": "",
+        "changesHint": "Address uncommitted changes: Commit \"git commit -a\", Stash \"git stash\" or Clean \"git reset --hard\"\n",
+        "checkRemoteHint": "Run \"git remote -v\" for a list of available remote repositories.\n",
+        "publishHint": "Ensure that you have access to publish to the registry and that the current version does not already exist.\n",
+        "publishDevHint": "Ensure that you have access to publish to the registry and that the current version does not already exist.\nIf the npm tag specified by --tag is recognizable as a valid semver version number, it will be rejected by npm. This is because version numbers and tags share a common namespace for npm packages.\n",
+        "vcTagHint": "If the tag already exists, run \"git tag -d v${version}\" to remove the existing tag.\n",
+        "pushVCTagHint": "If the tag already exists, run \"git push ${remote} :refs/tags/v${version} to remove the existing tag.\n"
+    }
 }
