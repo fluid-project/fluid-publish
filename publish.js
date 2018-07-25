@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 /*
-Copyright 2015-2016 OCAD University
+Copyright 2015-2018 OCAD University
 
 Licensed under the New BSD license. You may not use this file except in
 compliance with this License.
@@ -176,7 +176,11 @@ publish.checkChanges = function (options) {
 /**
  * Checks that the remote exists. If it does not exist an error is thrown.
  *
- * @param options {Object} - e.g. {"checkRemoteCmd": "git ls-remote --exit-code ${remote}", "remoteName": "upstream", "checkRemoteHint": "check remote hint"}
+ * @param options {Object} - e.g. {
+ *                                    "checkRemoteCmd": "git ls-remote --exit-code ${remote}",
+ *                                    "remoteName": "upstream",
+ *                                    "checkRemoteHint": "check remote hint"
+ *                                }
  */
 publish.checkRemote = function (options) {
     publish.execSyncFromTemplate(options.checkRemoteCmd, {
@@ -203,7 +207,14 @@ publish.setVersion = function (version, options) {
  * the devName option is provided.
  *
  * @param moduleVersion {String} - The version of the module (e.g. X.x.x)
- * @param options {Object} - e.g. {"rawTimestampCmd": "git show -s --format=%ct HEAD", "revisionCmd": "git rev-parse --verify --short HEAD", "branchCmd": "git rev-parse --abbrev-ref HEAD", "devVersion": "${version}-${preRelease}.${timestamp}.${revision}", "devName": "", "devTag": "dev"}
+ * @param options {Object} - e.g. {
+ *                                    "rawTimestampCmd": "git show -s --format=%ct HEAD",
+ *                                    "revisionCmd": "git rev-parse --verify --short HEAD",
+ *                                    "branchCmd": "git rev-parse --abbrev-ref HEAD",
+ *                                    "devVersion": "${version}-${preRelease}.${timestamp}.${revision}",
+ *                                    "devName": "",
+ *                                    "devTag": "dev"
+ *                                }
  * @returns {String} - the current dev version number
  */
 publish.getDevVersion = function (moduleVersion, options) {
@@ -232,7 +243,16 @@ publish.getDevVersion = function (moduleVersion, options) {
  *
  * @param isTest {Boolean} - indicates if this is a test run or not
  * @param isDev {Boolean} - indicates if this is a development (true) or standard (false) release
- * @param options {Object} - e.g. {"packCmd": "npm pack", "publishCmd": "npm publish", "publishDevCmd": "npm publish --tag", "publishHint": "publish hint", "publishDevHint": "publish dev hint", devTag: "dev", "otpFlag": "${command}--otp=${otp}", otp=123456}
+ * @param options {Object} - e.g. {
+ *                                    "packCmd": "npm pack",
+ *                                    "publishCmd": "npm publish",
+ *                                    "publishDevCmd": "npm publish --tag",
+ *                                    "publishHint": "publish hint",
+ *                                    "publishDevHint": "publish dev hint",
+ *                                    "devTag": "dev",
+ *                                    "otpFlag": "${command} --otp=${otp}",
+ *                                    "otp"=123456
+ *                                }
  */
 publish.pubImpl = function (isTest, isDev, options) {
     if (isTest) {
@@ -256,7 +276,13 @@ publish.pubImpl = function (isTest, isDev, options) {
  *
  * @param isTest {Boolean} - indicates if this is a test run or not
  * @param version {String} - a string indicating the version
- * @param options {Object} - e.g. {"vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'", "pushVCTagCmd": "git push ${remote} v${version}", "remoteName": "upstream", "vcTagHint": "vc tag hint", "pushVCTagHint": "push vc tag hint"}
+ * @param options {Object} - e.g. {
+ *                                    "vcTagCmd": "git tag -a v${version} -m 'Tagging the ${version} release'",
+ *                                    "pushVCTagCmd": "git push ${remote} v${version}",
+ *                                    "remoteName": "upstream",
+ *                                    "vcTagHint": "vc tag hint",
+ *                                    "pushVCTagHint": "push vc tag hint"
+ *                                }
  */
 publish.tagVC = function (isTest, version, options) {
     publish.execSyncFromTemplate(options.vcTagCmd, {
