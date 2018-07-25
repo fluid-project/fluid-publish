@@ -20,9 +20,9 @@ module.exports = function (grunt) {
         lintAll: {
             sources: {
                 md: [ "*.md"],
-                js: ["**/*.js"],
+                js: ["./*.js", "tests/**/*.js"],
                 json: ["*.json", ".*.json", "tests/*.json", "!package-lock.json"],
-                other: ["./.*", "!node_modules/**/*.*", "!./**/.DS_Store"]
+                other: ["./.*", "!./**/.DS_Store"]
             }
         }
     });
