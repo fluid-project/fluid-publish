@@ -214,7 +214,7 @@ publish.standard();
                 Applies the otp flag to the CLI to execute a publish command. This is needed if the NPM account uses two-factor authentication and will only be applied if the otp option is set.
                 <ul>
                     <li>
-                        <code>${command}</code> will be substituted with the command being executed. Either <code>publichCmd</code> or <code>publishDevCmd</code>
+                        <code>${command}</code> will be substituted with the command being executed. Either <code>publishCmd</code> or <code>publishDevCmd</code>
                     </li>
                     <li>
                         <code>${otp}</code> will be substituted with the one-time password provided.
