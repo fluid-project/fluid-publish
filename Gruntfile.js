@@ -19,7 +19,7 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON("package.json"),
         lintAll: {
             sources: {
-                md: [ "**/*.md", "!node_modules/**/*.md"],
+                md: [ "*.md"],
                 js: ["**/*.js"],
                 json: ["*.json", ".*.json", "tests/*.json", "!package-lock.json"],
                 other: ["./.*", "!node_modules/**/*.*", "!./**/.DS_Store"]
