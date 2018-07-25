@@ -1,9 +1,13 @@
-# fluid-publish #
-A command line tool and node module that can be used to simplify the process of publishing a module to NPM. This is particularly useful for creating development releases, e.g. nightly or continuous integration releases.
+# fluid-publish
 
-By default this will create a release with version __X.x.x-prerelease.yyyymmddThhmmssZ.shortHash__ where __X.x.x__ is sourced from the version number in the package.json file, __-prerelease__ is from the `devTag` option (also applied as a tag to the release), and the __yyyymmddThhmmssZ.shortHash__ build identifier is generated based on the latest commit.
+A command line tool and node module that can be used to simplify the process of publishing a module to NPM. This is
+particularly useful for creating development releases, e.g. nightly or continuous integration releases.
 
-## Installation ##
+By default this will create a release with version __X.x.x-prerelease.yyyymmddThhmmssZ.shortHash__ where __X.x.x__ is
+sourced from the version number in the package.json file, __-prerelease__ is from the `devTag` option (also applied as a
+tag to the release), and the __yyyymmddThhmmssZ.shortHash__ build identifier is generated based on the latest commit.
+
+## Installation
 
 ```bash
 # global install
@@ -13,9 +17,9 @@ npm install fluid-publish -g
 npm install fluid-publish --save-dev
 ```
 
-## Usage ##
+## Usage
 
-### Command Line API ###
+### Command Line API
 
 Run these commands from the root directory of the module to be published.
 
@@ -27,7 +31,7 @@ fluid-publish
 ./node_modules/.bin/fluid-publish
 ```
 
-#### --version ####
+#### --version
 
 __value__: true (Boolean)
 
@@ -40,23 +44,25 @@ fluid-publish --version
 # fluid-publish 2.0.0
 ```
 
-
-#### --standard ####
+#### --standard
 
 __value__: true (Boolean)
 
-Specifies that a standard release should be generated. This creates a release named after the version in the package.json file. It will not increase the version number. However, it will create a tag and publish this tag to the version control system.
+Specifies that a standard release should be generated. This creates a release named after the version in the
+package.json file. It will not increase the version number. However, it will create a tag and publish this tag to the
+version control system.
 
 ```bash
 # creates a standard release
 fluid-publish --standard
 ```
 
-#### --test ####
+#### --test
 
 __value__: true (Boolean)
 
-Specifies that a tarball should be created instead of publishing to NPM. This is useful to use a means of testing that the publish will happen correctly.
+Specifies that a tarball should be created instead of publishing to NPM. This is useful to use a means of testing that
+the publish will happen correctly.
 
 ```bash
 # creates a tarball
@@ -68,7 +74,7 @@ fluid-publish
 fluid-publish --standard
 ```
 
-#### --otp ####
+#### --otp
 
 __value__: (String)
 
@@ -79,9 +85,10 @@ Specifies the one-time password to use. This is required if the NPM account has 
 fluid-publish --otp=12345
 ```
 
-#### options #####
+#### options
 
-Optional key/value pairs, in the form `key=value`, to override the default configuration used across the publish script. The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key.
+Optional key/value pairs, in the form `key=value`, to override the default configuration used across the publish script.
+The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key.
 
 <em><strong>NOTE</strong>: If only a <code>key</code> is provided, the value is assumed to be <code>true</code></em>
 
@@ -92,40 +99,46 @@ Optional key/value pairs, in the form `key=value`, to override the default confi
 fluid-publish devTag="nightly"
 ```
 
-### JavaScript API ###
+### JavaScript API
 
 fluid.publish can also be accessed through standard JavaScript function calls in a  [node](https://nodejs.org) app.
 
+#### `dev`
 
-#### `dev` ####
-
-Publishes a development build. This creates a release named after the version, but with the build stamp appended to the end. By default this will create a release with version X.x.x-prerelease.yyyymmddThhmmssZ.shortHash where X.x.x is sourced from the version number in the package.json file, -prerelease is from the `devTag` option (also applied as a tag to the release), and the build identifier (yyyymmddThhmmssZ.shortHash) is generated based on the latest commit.
+Publishes a development build. This creates a release named after the version, but with the build stamp appended to the
+end. By default this will create a release with version X.x.x-prerelease.yyyymmddThhmmssZ.shortHash where X.x.x is
+sourced from the version number in the package.json file, -prerelease is from the `devTag` option (also applied as a
+tag to the release), and the build identifier (yyyymmddThhmmssZ.shortHash) is generated based on the latest commit.
 
 ```javascript
 var publish = require("fluid-publish");
 publish.dev();
 ```
 
-##### arguments #####
+##### arguments
 
  1. isTest {Boolean} - Indicates if this is a test run, if true a tarball will be generated instead of publishing to NPM.
- 2. options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key. (See: [Options](#options))
+ 2. options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the
+ `defaultOptions` key. (See: [Options](#options))
 
-#### `standard` ####
+#### `standard`
 
-Publishes a release build. This creates a release named after the version in the package.json file. By default it will not increase the version number, this must be done separately. However, it will create a tag and publish this tag to the version control system.
+Publishes a release build. This creates a release named after the version in the package.json file. By default it will
+not increase the version number, this must be done separately. However, it will create a tag and publish this tag to the
+version control system.
 
 ```javascript
 var publish = require("fluid-publish");
 publish.standard();
 ```
 
-##### arguments #####
+##### arguments
 
  1. isTest {Boolean} - Indicates if this is a test run, if true a tarball will be generated instead of publishing to NPM.
- 2. options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions` key. (See: [Options](#options))
+ 2. options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions`
+ key. (See: [Options](#options))
 
-## Options ##
+## Options
 
 <table>
     <thead>
@@ -147,7 +160,8 @@ publish.standard();
                 <code>changesCmd</code>
             </td>
             <td>
-                The CLI to execute which determines if there are any uncommitted changes. It should return a string of changes, or nothing.
+                The CLI to execute which determines if there are any uncommitted changes. It should return a string of
+                changes, or nothing.
             </td>
             <td>
                 "git status -s -uno"
@@ -158,7 +172,8 @@ publish.standard();
                 <code>checkRemoteCmd</code>
             </td>
             <td>
-                The CLI to execute which determines if the remote repository exists. This prevents trying to push a version control tag to a repo that doesn't exist.
+                The CLI to execute which determines if the remote repository exists. This prevents trying to push a
+                version control tag to a repo that doesn't exist.
             </td>
             <td>
                 "git ls-remote --exit-code ${remote}"
@@ -211,10 +226,12 @@ publish.standard();
                 <code>otpFlag</code>
             </td>
             <td>
-                Applies the otp flag to the CLI to execute a publish command. This is needed if the NPM account uses two-factor authentication and will only be applied if the otp option is set.
+                Applies the otp flag to the CLI to execute a publish command. This is needed if the NPM account uses
+                two-factor authentication and will only be applied if the otp option is set.
                 <ul>
                     <li>
-                        <code>${command}</code> will be substituted with the command being executed. Either <code>publishCmd</code> or <code>publishDevCmd</code>
+                        <code>${command}</code> will be substituted with the command being executed. Either
+                        <code>publishCmd</code> or <code>publishDevCmd</code>
                     </li>
                     <li>
                         <code>${otp}</code> will be substituted with the one-time password provided.
@@ -226,7 +243,8 @@ publish.standard();
                 <br>
                 <br>
                 <p>
-                    <em><strong>NOTE</strong>: This is only required when two-factor authentication is enabled and will only be applied when a one-time password is provided.</em>
+                    <em><strong>NOTE</strong>: This is only required when two-factor authentication is enabled and will
+                    only be applied when a one-time password is provided.</em>
                 </p>
             </td>
         </tr>
@@ -281,7 +299,8 @@ publish.standard();
                 <br>
                 <br>
                 <p>
-                    <em><strong>NOTE</strong>: This command will update the version in the package.json file, but will not commit the change.</em>
+                    <em><strong>NOTE</strong>: This command will update the version in the package.json file, but will
+                    not commit the change.</em>
                 </p>
             </td>
         </tr>
@@ -293,7 +312,8 @@ publish.standard();
                 The CLI to execute which cleans up any temporary changes to the package.json file.
                 <ul>
                     <li>
-                        <code>${package}</code> will be substituted with the path to the executing modules package.json file.
+                        <code>${package}</code> will be substituted with the path to the executing modules package.json
+                        file.
                     </li>
                 </ul>
             </td>
@@ -344,12 +364,13 @@ publish.standard();
                         <code>${version}</code> will be substituted with the version in the package.json file.
                     </li>
                     <li>
-                        <code>${timestamp}</code> will be substituted with the generated ISO8601 timestamp based on the most recent commit.
+                        <code>${timestamp}</code> will be substituted with the generated ISO8601 timestamp based on the
+                        most recent commit.
                     </li>
                     <li>
                         <code>${revision}</code> will be substituted with the revision/hash of the most recent commit.
                     </li>
-                </ul>    
+                </ul>
             </td>
             <td>
                 "${version}.${timestamp}.${revision}"
@@ -360,7 +381,10 @@ publish.standard();
                 <code>devName</code>
             </td>
             <td>
-                An optional dev release name to be appended to the version. This will be separated by a "." (e.g. with "branchX" as the dev release name. 3.0.0.dev.20151015T131223Z.039d221.branchX). When a dev release is generated from a branch other than "master", the branch name will automatically be used as the dev release name, if <code>devName</code> is not supplied.
+                An optional dev release name to be appended to the version. This will be separated by a "." (e.g. with
+                "branchX" as the dev release name. 3.0.0.dev.20151015T131223Z.039d221.branchX). When a dev release is
+                generated from a branch other than "master", the branch name will automatically be used as the dev
+                release name, if <code>devName</code> is not supplied.
             </td>
             <td>
                 ""
@@ -396,7 +420,8 @@ publish.standard();
                 A hint for addressing uncommitted changes.
             </td>
             <td>
-                "Address uncommitted changes: Commit \"git commit -a\", Stash \"git stash\" or Clean \"git reset --hard\"\n"
+                "Address uncommitted changes: Commit \"git commit -a\", Stash \"git stash\" or Clean
+                \"git reset --hard\"\n"
             </td>
         </tr>
         <tr>
@@ -418,7 +443,8 @@ publish.standard();
                 A hint for addressing an issue where publishing a standard release to the registry fails.
             </td>
             <td>
-                "Ensure that you have access to publish to the registry and that the current version does not already exist.\n"
+                "Ensure that you have access to publish to the registry and that the current version does not already
+                exist.\n"
             </td>
         </tr>
         <tr>
@@ -429,7 +455,9 @@ publish.standard();
                 A hint for addressing an issue where publishing a development (pre-release) to the registry fails.
             </td>
             <td>
-                "Ensure that you have access to publish to the registry and that the current version does not already exist.\nIf the npm tag specified by --tag is recognizable as a valid semver version number, it will be rejected by npm. This is because version numbers and tags share a common namespace for npm packages.\n"
+                "Ensure that you have access to publish to the registry and that the current version does not already
+                exist.\nIf the npm tag specified by --tag is recognizable as a valid semver version number, it will be
+                rejected by npm. This is because version numbers and tags share a common namespace for npm packages.\n"
             </td>
         </tr>
         <tr>
@@ -451,15 +479,18 @@ publish.standard();
                 A hint for addressing an issue where pushing a version control tag to a remote repository fails.
             </td>
             <td>
-                "If the tag already exists, run \"git push ${remote} :refs/tags/v${version} to remove the existing tag.\n"
+                "If the tag already exists, run \"git push ${remote} :refs/tags/v${version} to remove the existing tag.
+                \n"
             </td>
         </tr>
     </tbody>
 </table>
 
-## Publishing Itself ##
+## Publishing Itself
 
-Publish can publish itself to NPM. This can be done using any of the [usage](#usage) methods described above, or via the NPM `pub` script defined in [package.json](package.json). The script makes use of the command line interface provided to interact with publish.js. However, with NPM you'll need to provide a set of "--" to identify arguments to the script.
+Publish can publish itself to NPM. This can be done using any of the [usage](#usage) methods described above, or via the
+NPM `pub` script defined in [package.json](package.json). The script makes use of the command line interface provided to
+interact with publish.js. However, with NPM you'll need to provide a set of "--" to identify arguments to the script.
 
 ```bash
 # publishes a dev release to NPM

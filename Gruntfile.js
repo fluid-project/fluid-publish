@@ -17,20 +17,18 @@ module.exports = function (grunt) {
     grunt.initConfig({
         // Project package file destination.
         pkg: grunt.file.readJSON("package.json"),
-        eslint: {
-            all: ["**/*.js"]
-        },
-        jsonlint: {
-            all: ["*.json", ".*.json", "tests/*.json"]
+        lintAll: {
+            sources: {
+                md: [ "**/*.md", "!node_modules/**/*.md"],
+                js: ["**/*.js"],
+                json: ["*.json", ".*.json", "tests/*.json", "!./package-lock.json"],
+                other: ["./.*", "!node_modules/**/*.*", "!./**/.DS_Store", "!./package-lock.json"]
+            }
         }
     });
 
-    // Load the plugin(s):
-    grunt.loadNpmTasks("fluid-grunt-eslint");
-    grunt.loadNpmTasks("grunt-jsonlint");
-
-    // Custom tasks:
+    grunt.loadNpmTasks("gpii-grunt-lint-all");
+    grunt.registerTask("lint", "Perform all standard lint checks.", ["lint-all"]);
 
     grunt.registerTask("default", ["lint"]);
-    grunt.registerTask("lint", "Apply eslint and jsonlint", ["eslint", "jsonlint"]);
 };
