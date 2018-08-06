@@ -15,14 +15,12 @@ module.exports = function (grunt) {
 
     // Project configuration.
     grunt.initConfig({
-        // Project package file destination.
-        pkg: grunt.file.readJSON("package.json"),
         lintAll: {
             sources: {
-                md: [ "*.md"],
-                js: ["./*.js", "tests/**/*.js"],
-                json: ["*.json", ".*.json", "tests/*.json", "!package-lock.json"],
-                other: ["./.*", "!./**/.DS_Store"]
+                md: [ "./*.md"],
+                js: ["./tests/**/*.js", "./*.js"],
+                json: ["./tests/**/*.json", "./*.json"],
+                other: ["./.*"]
             }
         }
     });
