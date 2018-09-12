@@ -1,6 +1,6 @@
 {
     "name": "fluid-publish",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "description": "A command line tool and node module that can be used to simplify the process of publishing a module to NPM. This is particularly useful for creating development releases, e.g. nightly or continuous integration releases.",
     "main": "publish.js",
     "engines": {
