@@ -142,17 +142,18 @@ publish.convertToISO8601 = function (timestamp) {
  *                        Can provide tokens in the form ${tokenName}
  * @param {Boolean} isTest - indicates if this is a test run or not. If it is
  *                           a test run, the command will be logged but not executed.
+ * @param {Object} options - provide options to underlying execSync command
  *
  * @return {Buffer|String} - the stdout from the command.
- * @throws {Error} - will contain the entire result from node's child_process.spawnSync()
+ * @throws {Error} - will contain the entire result from node's child_process.execSync() error
  */
-publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, hint, isTest) {
+publish.execSyncFromTemplate = function (cmdTemplate, cmdValues, hint, isTest, options) {
     var cmdStr = es6Template(cmdTemplate, cmdValues);
     publish.log("Executing Command: " + cmdStr);
 
     if (!isTest) {
         try {
-            return publish.execSync(cmdStr);
+            return publish.execSync(cmdStr, options);
         } catch (error) {
             var hintStr = es6Template(hint, cmdValues);
             publish.log("Hint: " + hintStr);
@@ -270,7 +271,7 @@ publish.pubImpl = function (isTest, isDev, options) {
             pubCmd = es6Template(options.otpFlag, {command: pubCmd, otp: options.otp});
         }
 
-        publish.execSyncFromTemplate(pubCmd, options, pubHint);
+        publish.execSyncFromTemplate(pubCmd, options, pubHint, false, {stdio: "inherit"});
     }
 };
 
