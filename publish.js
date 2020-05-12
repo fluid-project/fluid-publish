@@ -26,8 +26,7 @@ var es6Template = require("es6-template-strings");
 // execSync  and log are added to the exported "publish" namespace so they can
 // be stubbed in the tests.
 publish.execSync = require("child_process").execSync;
-publish.log = console.log;
-
+publish.log = console.log; // eslint-disable-line no-console
 
 
 /**
