@@ -8,7 +8,7 @@ You may obtain a copy of the License at
 https://github.com/fluid-project/first-discovery-server/raw/master/LICENSE.txt
 */
 /* eslint-env node */
-
+/* eslint no-console: "off" */
 "use strict";
 
 var path = require("path");
