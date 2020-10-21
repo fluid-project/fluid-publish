@@ -1,13 +1,13 @@
 #! /usr/bin/env node
 
 /*
-Copyright 2015-2018 OCAD University
+Copyright 2015-2020 OCAD University
 
 Licensed under the New BSD license. You may not use this file except in
 compliance with this License.
 
 You may obtain a copy of the License at
-https://github.com/fluid-project/first-discovery-server/raw/master/LICENSE.txt
+https://raw.githubusercontent.com/fluid-project/fluid-publish/main/LICENSE
 */
 
 /* eslint-env node */
@@ -206,7 +206,7 @@ publish.setVersion = function (version, options) {
 
 /**
  * Calculates the current dev version of the package.
- * Will include dev version name if run on a branch other than master, or if
+ * Will include dev version name if run on a branch other than master or main, or if
  * the devName option is provided.
  *
  * @param {String} moduleVersion - The version of the module (e.g. X.x.x)
@@ -233,7 +233,7 @@ publish.getDevVersion = function (moduleVersion, options) {
         revision: revision
     });
 
-    if (branch !== "master" || options.devName) {
+    if (branch !== "master" && branch !== "main" || options.devName) {
         newStr = newStr + "." + (options.devName || branch);
     }
 
