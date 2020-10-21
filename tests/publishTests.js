@@ -1,11 +1,11 @@
 /*
-Copyright 2015-2016 OCAD University
+Copyright 2015-2020 OCAD University
 
 Licensed under the New BSD license. You may not use this file except in
 compliance with this License.
 
 You may obtain a copy of the License at
-https://github.com/fluid-project/first-discovery-server/raw/master/LICENSE.txt
+https://raw.githubusercontent.com/fluid-project/fluid-publish/main/LICENSE
 */
 /* eslint-env node */
 /* eslint no-console: "off" */
@@ -306,6 +306,30 @@ var getDevVersionFixture = [{
     returnedTimestamp: 1444914743,
     returnedRevision: "039d221",
     returnedBranch: "master"
+}, {
+    rawTimestampCmd: "get raw timestamp",
+    revisionCmd: "get revision",
+    branchCmd: "get branch",
+    devVersion: "${version}-${preRelease}.${timestamp}.${revision}",
+    devName: "",
+    devTag: "test",
+    moduleVersion: "1.2.3",
+    expectedVersion: "1.2.3-test.20151015T131223Z.039d221",
+    returnedTimestamp: 1444914743,
+    returnedRevision: "039d221",
+    returnedBranch: "main"
+}, {
+    rawTimestampCmd: "get raw timestamp",
+    revisionCmd: "get revision",
+    branchCmd: "get branch",
+    devVersion: "${version}-${preRelease}.${timestamp}.${revision}",
+    devName: "main-dev",
+    devTag: "test",
+    moduleVersion: "1.2.3",
+    expectedVersion: "1.2.3-test.20151015T131223Z.039d221.main-dev",
+    returnedTimestamp: 1444914743,
+    returnedRevision: "039d221",
+    returnedBranch: "main"
 }, {
     rawTimestampCmd: "get raw timestamp",
     revisionCmd: "get revision",
