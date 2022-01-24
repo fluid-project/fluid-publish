@@ -1,12 +1,13 @@
 {
     "name": "fluid-publish",
-    "version": "2.4.0",
+    "version": "2.4.1",
     "description": "A command line tool and node module that can be used to simplify the process of publishing a module to NPM. This is particularly useful for creating development releases, e.g. nightly or continuous integration releases.",
     "main": "publish.js",
     "engines": {
         "node": ">=4.0.0"
     },
     "scripts": {
+        "lint": "fluid-lint-all",
         "pub": "node publish.js",
         "test": "node tests/publishTests.js"
     },
@@ -33,10 +34,9 @@
         "extend": "3.0.2"
     },
     "devDependencies": {
-        "eslint-config-fluid": "1.4.0",
-        "gpii-grunt-lint-all": "1.0.7",
-        "grunt": "1.1.0",
-        "sinon": "9.0.2"
+        "eslint-config-fluid": "2.0.0",
+        "fluid-lint-all": "1.1.5",
+        "sinon": "12.0.1"
     },
     "defaultOptions": {
         "changesCmd": "git status -s -uno",
