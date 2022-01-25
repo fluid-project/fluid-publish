@@ -117,7 +117,8 @@ publish.dev();
 
 ##### arguments
 
- 1. isTest {Boolean} - Indicates if this is a test run, if true a tarball will be generated instead of publishing to NPM.
+ 1. isTest {Boolean} - Indicates if this is a test run, if true a tarball will be generated instead of publishing to
+    NPM.
  2. options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the
  `defaultOptions` key. (See: [Options](#options))
 
@@ -134,9 +135,10 @@ publish.standard();
 
 ##### arguments
 
- 1. isTest {Boolean} - Indicates if this is a test run, if true a tarball will be generated instead of publishing to NPM.
- 2. options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the `defaultOptions`
- key. (See: [Options](#options))
+ 1. isTest {Boolean} - Indicates if this is a test run, if true a tarball will be generated instead of publishing to
+    NPM.
+ 2. options {Object} - The defaults can be found in publish.js's [package.json](package.json) file under the
+    `defaultOptions` key. (See: [Options](#options))
 
 ## Options
 
@@ -383,8 +385,8 @@ publish.standard();
             <td>
                 An optional dev release name to be appended to the version. This will be separated by a "." (e.g. with
                 "branchX" as the dev release name. 3.0.0.dev.20151015T131223Z.039d221.branchX). When a dev release is
-                generated from a branch other than "master" or "main", the branch name will automatically be used as the dev
-                release name, if <code>devName</code> is not supplied.
+                generated from a branch other than "master" or "main", the branch name will automatically be used as the
+                dev release name, if <code>devName</code> is not supplied.
             </td>
             <td>
                 ""
